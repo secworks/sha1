@@ -3,6 +3,7 @@ sha1
 
 ## Introduction ##
 Verilog implementation of the SHA-1 cryptgraphic hash function.
+The implementaion follows the specification in NIST FIPS 180-4.
 
 
 ## Implementation details ##
