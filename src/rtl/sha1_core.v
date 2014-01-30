@@ -1,8 +1,8 @@
 //======================================================================
 //
-// sha256_core.v
-// -------------
-// Verilog 2001 implementation of the SHA-256 hash function.
+// sha1_core.v
+// -----------
+// Verilog 2001 implementation of the SHA-1 hash function.
 // This is the internal core with wide interfaces.
 //
 //
@@ -36,20 +36,20 @@
 //
 //======================================================================
 
-module sha256_core(
-                   input wire            clk,
-                   input wire            reset_n,
+module sha1_core(
+                 input wire            clk,
+                 input wire            reset_n,
                  
-                   input wire            init,
-                   input wire            next,
+                 input wire            init,
+                 input wire            next,
 
-                   input wire [511 : 0]  block,
-                   
-                   output wire           ready,
-                    
-                   output wire [255 : 0] digest,
-                   output wire           digest_valid
-                  );
+                 input wire [511 : 0]  block,
+                 
+                 output wire           ready,
+                  
+                 output wire [255 : 0] digest,
+                 output wire           digest_valid
+                );
 
   
   //----------------------------------------------------------------
@@ -64,6 +64,8 @@ module sha256_core(
   parameter H0_6 = 32'h1f83d9ab;
   parameter H0_7 = 32'h5be0cd19;
 
+  parameter SHA1_ROUNDS = 79;
+  
   parameter CTRL_IDLE   = 0;
   parameter CTRL_ROUNDS = 1;
   parameter CTRL_DONE   = 2;
@@ -108,8 +110,8 @@ module sha256_core(
   reg [31 : 0] H7_new;
   reg          H_we;
   
-  reg [5 : 0] t_ctr_reg;
-  reg [5 : 0] t_ctr_new;
+  reg [6 : 0] t_ctr_reg;
+  reg [6 : 0] t_ctr_new;
   reg         t_ctr_we;
   reg         t_ctr_inc;
   reg         t_ctr_rst;
@@ -118,9 +120,9 @@ module sha256_core(
   reg digest_valid_new;
   reg digest_valid_we;
   
-  reg [1 : 0] sha256_ctrl_reg;
-  reg [1 : 0] sha256_ctrl_new;
-  reg         sha256_ctrl_we;
+  reg [1 : 0] sha1_ctrl_reg;
+  reg [1 : 0] sha1_ctrl_new;
+  reg         sha1_ctrl_we;
 
   
   //----------------------------------------------------------------
@@ -149,24 +151,24 @@ module sha256_core(
   //----------------------------------------------------------------
   // Module instantiantions.
   //----------------------------------------------------------------
-  sha256_k_constants k_constants(
-                                 .addr(t_ctr_reg),
-                                 .K(k_data)
-                                 );
+  sha1_k_constants k_constants(
+                               .addr(t_ctr_reg),
+                               .K(k_data)
+                               );
 
 
-  sha256_w_mem w_mem(
-                     .clk(clk),
-                     .reset_n(reset_n),
+  sha1_w_mem w_mem(
+                   .clk(clk),
+                   .reset_n(reset_n),
 
-                     .init(w_init),
+                   .init(w_init),
 
-                     .block(block),
-                     .addr(t_ctr_reg),
+                   .block(block),
+                   .addr(t_ctr_reg),
 
-                     .ready(w_ready),
-                     .w(w_data)
-                   );
+                   .ready(w_ready),
+                   .w(w_data)
+                  );
 
   
   //----------------------------------------------------------------
@@ -208,7 +210,7 @@ module sha256_core(
           H7_reg           <= 32'h00000000;
           digest_valid_reg <= 0;
           t_ctr_reg        <= 6'b000000;
-          sha256_ctrl_reg  <= CTRL_IDLE;
+          sha1_ctrl_reg  <= CTRL_IDLE;
         end
       else
         begin
@@ -247,9 +249,9 @@ module sha256_core(
               digest_valid_reg <= digest_valid_new;
             end
           
-          if (sha256_ctrl_we)
+          if (sha1_ctrl_we)
             begin
-              sha256_ctrl_reg <= sha256_ctrl_new;
+              sha1_ctrl_reg <= sha1_ctrl_new;
             end
         end
     end // reg_update
@@ -429,11 +431,11 @@ module sha256_core(
 
   
   //----------------------------------------------------------------
-  // sha256_ctrl_fsm
+  // sha1_ctrl_fsm
   // Logic for the state machine controlling the core behaviour.
   //----------------------------------------------------------------
   always @*
-    begin : sha256_ctrl_fsm
+    begin : sha1_ctrl_fsm
       digest_init      = 0;
       digest_update    = 0;
 
@@ -451,11 +453,11 @@ module sha256_core(
       digest_valid_new = 0;
       digest_valid_we  = 0;
       
-      sha256_ctrl_new  = CTRL_IDLE;
-      sha256_ctrl_we   = 0;
+      sha1_ctrl_new  = CTRL_IDLE;
+      sha1_ctrl_we   = 0;
 
       
-      case (sha256_ctrl_reg)
+      case (sha1_ctrl_reg)
         CTRL_IDLE:
           begin
             ready_flag = 1;
@@ -469,8 +471,8 @@ module sha256_core(
                 t_ctr_rst        = 1;
                 digest_valid_new = 0;
                 digest_valid_we  = 1;
-                sha256_ctrl_new  = CTRL_ROUNDS;
-                sha256_ctrl_we   = 1;
+                sha1_ctrl_new  = CTRL_ROUNDS;
+                sha1_ctrl_we   = 1;
               end
 
             if (next)
@@ -480,8 +482,8 @@ module sha256_core(
                 t_ctr_rst        = 1;
                 digest_valid_new = 0;
                 digest_valid_we  = 1;
-                sha256_ctrl_new  = CTRL_ROUNDS;
-                sha256_ctrl_we   = 1;
+                sha1_ctrl_new  = CTRL_ROUNDS;
+                sha1_ctrl_we   = 1;
               end
           end
 
@@ -491,10 +493,10 @@ module sha256_core(
             state_update = 1;
             t_ctr_inc    = 1;
 
-            if (t_ctr_reg == 63)
+            if (t_ctr_reg == SHA1_ROUNDS)
               begin
-                sha256_ctrl_new = CTRL_DONE;
-                sha256_ctrl_we  = 1;
+                sha1_ctrl_new = CTRL_DONE;
+                sha1_ctrl_we  = 1;
               end
           end
 
@@ -505,14 +507,14 @@ module sha256_core(
             digest_valid_new = 1;
             digest_valid_we  = 1;
 
-            sha256_ctrl_new  = CTRL_IDLE;
-            sha256_ctrl_we   = 1;
+            sha1_ctrl_new  = CTRL_IDLE;
+            sha1_ctrl_we   = 1;
           end
-      endcase // case (sha256_ctrl_reg)
-    end // sha256_ctrl_fsm
+      endcase // case (sha1_ctrl_reg)
+    end // sha1_ctrl_fsm
     
-endmodule // sha256_core
+endmodule // sha1_core
 
 //======================================================================
-// EOF sha256_core.v
+// EOF sha1_core.v
 //======================================================================
