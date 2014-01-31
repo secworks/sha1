@@ -128,10 +128,8 @@ module tb_sha1_core();
       $display("ready  = 0x%01x, valid = 0x%01x", 
                dut.ready, dut.digest_valid);
       $display("digest = 0x%064x", dut.digest);
-      $display("H0_reg = 0x%08x, H1_reg = 0x%08x, H2_reg = 0x%08x, H3_reg = 0x%08x", 
-               dut.H0_reg, dut.H1_reg, dut.H2_reg, dut.H3_reg);
-      $display("H4_reg = 0x%08x, H5_reg = 0x%08x, H6_reg = 0x%08x, H7_reg = 0x%08x", 
-               dut.H4_reg, dut.H5_reg, dut.H6_reg, dut.H7_reg);
+      $display("H0_reg = 0x%08x, H1_reg = 0x%08x, H2_reg = 0x%08x, H3_reg = 0x%08x, H4_reg = 0x%08x", 
+               dut.H0_reg, dut.H1_reg, dut.H2_reg, dut.H3_reg, dut.H4_reg);
       $display("");
       
       $display("Control signals and counter:");

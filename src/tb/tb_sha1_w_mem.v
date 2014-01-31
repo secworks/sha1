@@ -65,7 +65,7 @@ module tb_sha1_w_mem();
 
   reg           tb_init;
   reg [511 : 0] tb_block;
-  reg [5 : 0]   tb_addr;
+  reg [6 : 0]   tb_addr;
   wire          tb_ready;
   wire [31 : 0] tb_w;
 
@@ -78,17 +78,17 @@ module tb_sha1_w_mem();
   // Device Under Test.
   //----------------------------------------------------------------
   sha1_w_mem dut(
-                   .clk(tb_clk),
-                   .reset_n(tb_reset_n),
-                   
-                   .init(tb_init),
-                   
-                   .block(tb_block),
-                   .addr(tb_addr),
-                   
-                   .ready(tb_ready),
-                   .w(tb_w)
-                  );
+                 .clk(tb_clk),
+                 .reset_n(tb_reset_n),
+                 
+                 .init(tb_init),
+                 
+                 .block(tb_block),
+                 .addr(tb_addr),
+                 
+                 .ready(tb_ready),
+                 .w(tb_w)
+                );
   
 
   //----------------------------------------------------------------
