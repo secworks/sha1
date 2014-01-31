@@ -1,8 +1,8 @@
 //======================================================================
 //
-// sha256_k_constants.v
+// sha1_k_constants.v
 // --------------------
-// The table K with constants in the SHA-256 hash function.
+// The table K with constants in the SHA-1 hash function.
 //
 //
 // Copyright (c) 2013 Secworks Sweden AB
@@ -35,11 +35,12 @@
 //
 //======================================================================
 
-module sha256_k_constants(
-                          input wire  [6 : 0] addr,
-                          output wire [31 : 0] K
-                         );
+module sha1_k_constants(
+                        input wire  [6 : 0] addr,
+                        output wire [31 : 0] K
+                       );
 
+  
   //----------------------------------------------------------------
   // Wires.
   //----------------------------------------------------------------
@@ -74,8 +75,8 @@ module sha256_k_constants(
           tmp_K = 32'hca62c1d6;
         end
     end // block: addr_mux
-endmodule // sha256_k_constants
+endmodule // sha1_k_constants
 
 //======================================================================
-// sha256_k_constants.v
+// sha1_k_constants.v
 //======================================================================
