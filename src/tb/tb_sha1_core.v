@@ -163,9 +163,6 @@ module tb_sha1_core();
 
       $display("wmem data:");
       $display("w_addr = 0x%02x,       w_data  = 0x%08x", dut.w_mem.addr, dut.w_mem.w_tmp);
-      $display("w_ctr  = 0x%02x,       w_state = 0x%01x", dut.w_mem.w_ctr_reg, dut.w_mem.sha1_w_mem_ctrl_reg);
-      $display("d0     = 0x%02x, d1      = 0x%01x", dut.w_mem.d0, dut.w_mem.d1);
-      $display("w_7    = 0x%02x, w_16    = 0x%01x", dut.w_mem.w_7, dut.w_mem.w_16);
       $display("");
     end
   endtask // dump_dut_state
