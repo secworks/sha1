@@ -1,8 +1,8 @@
 //======================================================================
 //
-// sha256.v
-// --------
-// Top level wrapper for the SHA-256 hash function providing
+// sha1.v
+// ------
+// Top level wrapper for the SHA-1 hash function providing
 // a simple memory like interface with 32 bit data access.
 //
 //
@@ -35,7 +35,7 @@
 //
 //======================================================================
 
-module sha256(
+module sha1(
               // Clock and reset.
               input wire           clk,
               input wire           reset_n,
@@ -166,7 +166,7 @@ module sha256(
   //----------------------------------------------------------------
   // core instantiation.
   //----------------------------------------------------------------
-  sha256_core core(
+  sha1_core core(
                    .clk(clk),
                    .reset_n(reset_n),
                    
@@ -581,8 +581,8 @@ module sha256(
             end
         end
     end // addr_decoder
-endmodule // sha256
+endmodule // sha1
 
 //======================================================================
-// EOF sha256.v
+// EOF sha1.v
 //======================================================================
