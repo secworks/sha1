@@ -272,9 +272,6 @@ module sha1_core(
           H2_new = H2_reg + c_reg;
           H3_new = H3_reg + d_reg;
           H4_new = H4_reg + e_reg;
-          H5_new = H5_reg + f_reg;
-          H6_new = H6_reg + g_reg;
-          H7_new = H7_reg + h_reg;
           H_we = 1;
         end
     end // digest_logic
