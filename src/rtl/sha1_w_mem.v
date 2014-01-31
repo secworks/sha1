@@ -41,66 +41,29 @@ module sha1_w_mem(
                   input wire           reset_n,
 
                   input wire           init,
-
                   input wire [511 : 0] block,
-                  input wire  [6 : 0]  addr,
 
-                  output wire          ready,
+                  input wire [6 :   0] addr,
                   output wire [31 : 0] w
                  );
 
   
   //----------------------------------------------------------------
-  // Internal constant and parameter definitions.
-  //----------------------------------------------------------------
-  parameter SHA1_ROUNDS = 79;
-
-  parameter CTRL_IDLE   = 0;
-  parameter CTRL_UPDATE = 1;
-  
-  
-  //----------------------------------------------------------------
   // Registers including update variables and write enable.
   //----------------------------------------------------------------
-  reg [31 : 0] w_mem [0 : 79];
-  reg w_mem_we;
-  reg w0_w15_we;
-  
-  reg [5 : 0] w_ctr_reg;
-  reg [5 : 0] w_ctr_new;
-  reg         w_ctr_we;
-  reg         w_ctr_inc;
-  reg         w_ctr_set;
-  
-  reg [1 : 0]  sha1_w_mem_ctrl_reg;
-  reg [1 : 0]  sha1_w_mem_ctrl_new;
-  reg          sha1_w_mem_ctrl_we;
+  reg [31 : 0] w_mem [0 : 15];
   
   
   //----------------------------------------------------------------
   // Wires.
   //----------------------------------------------------------------
   reg [31 : 0] w_tmp;
-  reg [31 : 0] w_new;
-
-  reg [5 : 0] w_addr;
-  
-  reg [31 : 0] d1;
-  reg [31 : 0] d0;
-  reg [31 : 0] w_7;
-  reg [31 : 0] w_16;
-  
-  reg w_init;
-  reg w_update;
-  
-  reg ready_tmp;
   
   
   //----------------------------------------------------------------
   // Concurrent connectivity for ports etc.
   //----------------------------------------------------------------
   assign w = w_tmp;
-  assign ready = ready_tmp;
   
   
   //----------------------------------------------------------------
@@ -113,14 +76,26 @@ module sha1_w_mem(
     begin : reg_update
       if (!reset_n)
         begin
-          w_ctr_reg       <= 6'h00;
-
-          sha1_w_mem_ctrl_reg <= CTRL_IDLE;
+          w_mem[00] <= 32'h00000000;
+          w_mem[01] <= 32'h00000000;
+          w_mem[02] <= 32'h00000000;
+          w_mem[03] <= 32'h00000000;
+          w_mem[04] <= 32'h00000000;
+          w_mem[05] <= 32'h00000000;
+          w_mem[06] <= 32'h00000000;
+          w_mem[07] <= 32'h00000000;
+          w_mem[08] <= 32'h00000000;
+          w_mem[09] <= 32'h00000000;
+          w_mem[10] <= 32'h00000000;
+          w_mem[11] <= 32'h00000000;
+          w_mem[12] <= 32'h00000000;
+          w_mem[13] <= 32'h00000000;
+          w_mem[14] <= 32'h00000000;
+          w_mem[15] <= 32'h00000000;
         end
       else
         begin
-
-          if (w0_w15_we)
+          if (init)
             begin
               w_mem[00] <= block[511 : 480];
               w_mem[01] <= block[479 : 448];
@@ -139,21 +114,6 @@ module sha1_w_mem(
               w_mem[14] <= block[63  :  32];
               w_mem[15] <= block[31  :   0];
             end
-
-          if (w_mem_we)
-            begin
-              w_mem[w_addr] <= w_new;
-            end
-          
-          if (w_ctr_we)
-            begin
-              w_ctr_reg <= w_ctr_new;
-            end
-          
-          if (sha1_w_mem_ctrl_we)
-            begin
-              sha1_w_mem_ctrl_reg <= sha1_w_mem_ctrl_new;
-            end
         end
     end // reg_update
 
@@ -161,165 +121,31 @@ module sha1_w_mem(
   //----------------------------------------------------------------
   // external_addr_mux
   //
-  // Mux for the external read operation. This is where we exract
-  // the W variable.
+  // Mux for the external read operation. This is where we extract
+  // the W variable. This version implements the circular buffer
+  // type of W scheduler for SHA-1.
   //----------------------------------------------------------------
   always @*
     begin : external_addr_mux
-      w_tmp = w_mem[addr];
+      reg [3  :  0] s13_addr;
+      reg [3  :  0] s8_addr;
+      reg [3  :  0] s2_addr;
+      reg [31 :  0] pre_w;
+      
+      s13_addr = (addr + 13);
+      s8_addr  = (addr +  8);
+      s2_addr  = (addr +  2);
+      pre_w = w_mem[s13_addr] ^ w_mem[s8_addr] ^ w_mem[s2_addr];
+      
+      if (addr < 16)
+        begin
+          w_tmp = w_mem[addr[3 : 0]];
+        end
+      else
+        begin
+          w_tmp = {pre_w[30 : 0], pre_w[31]};
+        end
     end // external_addr_mux
-
-
-  //----------------------------------------------------------------
-  // w_7_logic
-  //----------------------------------------------------------------
-  always @*
-    begin : w_7_logic
-      reg [5 : 0] w_7_addr;
-
-      w_7_addr = w_ctr_reg - 6'h07;
-      w_7 = w_mem[w_7_addr];
-    end // w_7_logic
-
-
-  //----------------------------------------------------------------
-  // w_16_logic
-  //----------------------------------------------------------------
-  always @*
-    begin : w_16_logic
-      reg [5 : 0] w_16_addr;
-
-      w_16_addr = w_ctr_reg - 6'h10;
-      w_16 = w_mem[w_16_addr];
-    end // w_16_logic
-
-
-  //----------------------------------------------------------------
-  // d0_logic
-  //----------------------------------------------------------------
-  always @*
-    begin : d0_logic
-      reg [31 : 0] w_15;
-      reg [5 : 0]  w_15_addr;
-
-      w_15_addr = w_ctr_reg - 6'h0f;
-      w_15 = w_mem[w_15_addr];
-
-      d0 = {w_15[6  : 0], w_15[31 :  7]} ^ 
-           {w_15[17 : 0], w_15[31 : 18]} ^ 
-           {3'b000, w_15[31 : 3]};
-    end // d0_logic
-
-
-  //----------------------------------------------------------------
-  // d1_logic
-  //----------------------------------------------------------------
-  always @*
-    begin : d1_logic
-      reg [31 : 0] w_2;
-      reg [5 : 0]  w_2_addr;
-
-      w_2_addr = w_ctr_reg - 6'h02;
-      w_2 = w_mem[w_2_addr];
-
-      d1 = {w_2[16 : 0], w_2[31 : 17]} ^ 
-           {w_2[18 : 0], w_2[31 : 19]} ^ 
-           {10'b0000000000, w_2[31 : 10]};
-    end // d1_logic
-  
-
-  //----------------------------------------------------------------
-  // w_schedule
-  //----------------------------------------------------------------
-  always @*
-    begin : w_schedule
-      w0_w15_we = 0;
-      w_mem_we = 0;
-      w_addr = 0;
-      
-      w_new = d1 + w_7 + d0 + w_16;
-      
-      if (w_init)
-        begin
-          w0_w15_we = 1;
-        end
-
-      if (w_update)
-        begin
-          w_mem_we = 1;
-          w_addr = w_ctr_reg;
-        end // if (w_update)
-    end // w_schedule
-
-  
-  //----------------------------------------------------------------
-  // w_ctr
-  // W schedule adress counter. Counts from 0x10 to 0x3f and
-  // is used to expand the block into words.
-  //----------------------------------------------------------------
-  always @*
-    begin : w_ctr
-      w_ctr_new = 0;
-      w_ctr_we  = 0;
-      
-      if (w_ctr_set)
-        begin
-          w_ctr_new = 6'h10;
-          w_ctr_we  = 1;
-        end
-
-      if (w_ctr_inc)
-        begin
-          w_ctr_new = w_ctr_reg + 6'h01;
-          w_ctr_we  = 1;
-        end
-    end // w_ctr
-
-  
-  //----------------------------------------------------------------
-  // sha1_w_mem_fsm
-  // Logic for the w shedule FSM.
-  //----------------------------------------------------------------
-  always @*
-    begin : sha1_w_mem_fsm
-      w_ctr_set = 0;
-      w_ctr_inc = 0;
-      w_init    = 0;
-      w_update  = 0;
-
-      ready_tmp = 0;
-      
-      sha1_w_mem_ctrl_new = CTRL_IDLE;
-      sha1_w_mem_ctrl_we  = 0;
-      
-      case (sha1_w_mem_ctrl_reg)
-        CTRL_IDLE:
-          begin
-            ready_tmp = 1;
-            
-            if (init)
-              begin
-                w_init    = 1;
-                w_ctr_set = 1;
-                
-                sha1_w_mem_ctrl_new = CTRL_UPDATE;
-                sha1_w_mem_ctrl_we  = 1;
-              end
-          end
-        
-        CTRL_UPDATE:
-          begin
-            w_update  = 1;
-            w_ctr_inc = 1;
-
-            if (w_ctr_reg == SHA1_ROUNDS)
-              begin
-                sha1_w_mem_ctrl_new = CTRL_IDLE;
-                sha1_w_mem_ctrl_we  = 1;
-              end
-          end
-      endcase // case (sha1_ctrl_reg)
-    end // sha1_ctrl_fsm
 
 endmodule // sha1_w_mem
 
