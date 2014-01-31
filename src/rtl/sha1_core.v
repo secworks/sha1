@@ -81,13 +81,7 @@ module sha1_core(
   reg [31 : 0] d_new;
   reg [31 : 0] e_reg;
   reg [31 : 0] e_new;
-  reg [31 : 0] f_reg;
-  reg [31 : 0] f_new;
-  reg [31 : 0] g_reg;
-  reg [31 : 0] g_new;
-  reg [31 : 0] h_reg;
-  reg [31 : 0] h_new;
-  reg          a_h_we;
+  reg          a_e_we;
 
   reg [31 : 0] H0_reg;
   reg [31 : 0] H0_new;
@@ -129,7 +123,7 @@ module sha1_core(
 
   reg ready_flag;
 
-  reg [31 : 0] t1;
+  reg [31 : 0] t;
   reg [31 : 0] t2;
 
   wire [31 : 0] k_data;
@@ -185,9 +179,6 @@ module sha1_core(
           c_reg            <= 32'h00000000;
           d_reg            <= 32'h00000000;
           e_reg            <= 32'h00000000;
-          f_reg            <= 32'h00000000;
-          g_reg            <= 32'h00000000;
-          h_reg            <= 32'h00000000;
           H0_reg           <= 32'h00000000;
           H1_reg           <= 32'h00000000;
           H2_reg           <= 32'h00000000;
@@ -200,16 +191,13 @@ module sha1_core(
       else
         begin
           
-          if (a_h_we)
+          if (a_e_we)
             begin
               a_reg <= a_new;
               b_reg <= b_new;
               c_reg <= c_new;
               d_reg <= d_new;
               e_reg <= e_new;
-              f_reg <= f_new;
-              g_reg <= g_new;
-              h_reg <= h_new;
             end
 
           if (H_we)
@@ -276,9 +264,9 @@ module sha1_core(
 
 
   //----------------------------------------------------------------
-  // t1_logic
+  // t_logic
   //
-  // The logic for the T1 function.
+  // The logic for the T function.
   //----------------------------------------------------------------
   always @*
     begin : t1_logic
@@ -323,18 +311,12 @@ module sha1_core(
   //----------------------------------------------------------------
   always @*
     begin : state_logic
-      reg [31 : 0] tmp1;
-      reg [31 : 0] tmp2;
-      
       a_new  = 32'h00000000;
       b_new  = 32'h00000000;
       c_new  = 32'h00000000;
       d_new  = 32'h00000000;
       e_new  = 32'h00000000;
-      f_new  = 32'h00000000;
-      g_new  = 32'h00000000;
-      h_new  = 32'h00000000;
-      a_h_we = 0;
+      a_e_we = 0;
       
       if (state_init)
         begin
@@ -345,7 +327,7 @@ module sha1_core(
               c_new  = H0_2;
               d_new  = H0_3;
               e_new  = H0_4;
-              a_h_we = 1;
+              a_e_we = 1;
             end
           else
             begin
@@ -354,21 +336,18 @@ module sha1_core(
               c_new  = H2_reg;
               d_new  = H3_reg;
               e_new  = H4_reg;
-              a_h_we = 1;
+              a_e_we = 1;
             end
         end
       
       if (state_update)
         begin
-          a_new  = t1 + t2;
+          a_new  = t;
           b_new  = a_reg;
-          c_new  = b_reg;
+          c_new  = {b_reg[1 : 0], b_reg[31 : 2]};
           d_new  = c_reg;
-          e_new  = d_reg + t1;
-          f_new  = e_reg;
-          g_new  = f_reg;
-          h_new  = g_reg;
-          a_h_we = 1;
+          e_new  = d_reg;
+          a_e_we = 1;
         end
     end // state_logic
 
