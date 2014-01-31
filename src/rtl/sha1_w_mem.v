@@ -1,9 +1,9 @@
 //======================================================================
 //
-// sha256_w_mem_reg.v
+// sha1_w_mem_reg.v
 // -----------------
-// The W memory. This includes functionality to expand the block
-// into 64 words.
+// The SHA-1 W memory. This memory includes functionality to 
+// expand the block into 80 words.
 //
 //
 // Copyright (c) 2013 Secworks Sweden AB
@@ -36,23 +36,25 @@
 //
 //======================================================================
 
-module sha256_w_mem(
-                    input wire           clk,
-                    input wire           reset_n,
+module sha1_w_mem(
+                  input wire           clk,
+                  input wire           reset_n,
 
-                    input wire           init,
+                  input wire           init,
 
-                    input wire [511 : 0] block,
-                    input wire  [5 : 0]  addr,
+                  input wire [511 : 0] block,
+                  input wire  [5 : 0]  addr,
 
-                    output wire          ready,
-                    output wire [31 : 0] w
-                   );
+                  output wire          ready,
+                  output wire [31 : 0] w
+                 );
 
   
   //----------------------------------------------------------------
   // Internal constant and parameter definitions.
   //----------------------------------------------------------------
+  parameter SHA1_ROUNDS = 79;
+
   parameter CTRL_IDLE   = 0;
   parameter CTRL_UPDATE = 1;
   
@@ -70,9 +72,9 @@ module sha256_w_mem(
   reg         w_ctr_inc;
   reg         w_ctr_set;
   
-  reg [1 : 0]  sha256_w_mem_ctrl_reg;
-  reg [1 : 0]  sha256_w_mem_ctrl_new;
-  reg          sha256_w_mem_ctrl_we;
+  reg [1 : 0]  sha1_w_mem_ctrl_reg;
+  reg [1 : 0]  sha1_w_mem_ctrl_new;
+  reg          sha1_w_mem_ctrl_we;
   
   
   //----------------------------------------------------------------
@@ -113,7 +115,7 @@ module sha256_w_mem(
         begin
           w_ctr_reg       <= 6'h00;
 
-          sha256_w_mem_ctrl_reg <= CTRL_IDLE;
+          sha1_w_mem_ctrl_reg <= CTRL_IDLE;
         end
       else
         begin
@@ -148,9 +150,9 @@ module sha256_w_mem(
               w_ctr_reg <= w_ctr_new;
             end
           
-          if (sha256_w_mem_ctrl_we)
+          if (sha1_w_mem_ctrl_we)
             begin
-              sha256_w_mem_ctrl_reg <= sha256_w_mem_ctrl_new;
+              sha1_w_mem_ctrl_reg <= sha1_w_mem_ctrl_new;
             end
         end
     end // reg_update
@@ -275,11 +277,11 @@ module sha256_w_mem(
 
   
   //----------------------------------------------------------------
-  // sha256_w_mem_fsm
+  // sha1_w_mem_fsm
   // Logic for the w shedule FSM.
   //----------------------------------------------------------------
   always @*
-    begin : sha256_w_mem_fsm
+    begin : sha1_w_mem_fsm
       w_ctr_set = 0;
       w_ctr_inc = 0;
       w_init    = 0;
@@ -287,10 +289,10 @@ module sha256_w_mem(
 
       ready_tmp = 0;
       
-      sha256_w_mem_ctrl_new = CTRL_IDLE;
-      sha256_w_mem_ctrl_we  = 0;
+      sha1_w_mem_ctrl_new = CTRL_IDLE;
+      sha1_w_mem_ctrl_we  = 0;
       
-      case (sha256_w_mem_ctrl_reg)
+      case (sha1_w_mem_ctrl_reg)
         CTRL_IDLE:
           begin
             ready_tmp = 1;
@@ -300,8 +302,8 @@ module sha256_w_mem(
                 w_init    = 1;
                 w_ctr_set = 1;
                 
-                sha256_w_mem_ctrl_new = CTRL_UPDATE;
-                sha256_w_mem_ctrl_we  = 1;
+                sha1_w_mem_ctrl_new = CTRL_UPDATE;
+                sha1_w_mem_ctrl_we  = 1;
               end
           end
         
@@ -310,17 +312,17 @@ module sha256_w_mem(
             w_update  = 1;
             w_ctr_inc = 1;
 
-            if (w_ctr_reg == 6'h3f)
+            if (w_ctr_reg == SHA1_ROUNDS)
               begin
-                sha256_w_mem_ctrl_new = CTRL_IDLE;
-                sha256_w_mem_ctrl_we  = 1;
+                sha1_w_mem_ctrl_new = CTRL_IDLE;
+                sha1_w_mem_ctrl_we  = 1;
               end
           end
-      endcase // case (sha256_ctrl_reg)
-    end // sha256_ctrl_fsm
+      endcase // case (sha1_ctrl_reg)
+    end // sha1_ctrl_fsm
 
-endmodule // sha256_w_mem
+endmodule // sha1_w_mem
 
 //======================================================================
-// sha256_w_mem.v
+// sha1_w_mem.v
 //======================================================================
