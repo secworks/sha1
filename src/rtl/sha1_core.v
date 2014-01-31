@@ -153,11 +153,9 @@ module sha1_core(
                    .reset_n(reset_n),
 
                    .init(w_init),
-
                    .block(block),
+                   
                    .addr(t_ctr_reg),
-
-                   .ready(w_ready),
                    .w(w_data)
                   );
 
