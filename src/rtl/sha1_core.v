@@ -55,14 +55,11 @@ module sha1_core(
   //----------------------------------------------------------------
   // Internal constant and parameter definitions.
   //----------------------------------------------------------------
-  parameter H0_0 = 32'h6a09e667;
-  parameter H0_1 = 32'hbb67ae85;
-  parameter H0_2 = 32'h3c6ef372;
-  parameter H0_3 = 32'ha54ff53a;
-  parameter H0_4 = 32'h510e527f;
-  parameter H0_5 = 32'h9b05688c;
-  parameter H0_6 = 32'h1f83d9ab;
-  parameter H0_7 = 32'h5be0cd19;
+  parameter H0_0 = 32'h67452301;
+  parameter H0_1 = 32'hefcdab89;
+  parameter H0_2 = 32'h98badcfe;
+  parameter H0_3 = 32'h10325476;
+  parameter H0_4 = 32'hc3d2e1f0;
 
   parameter SHA1_ROUNDS = 79;
   
@@ -102,12 +99,6 @@ module sha1_core(
   reg [31 : 0] H3_new;
   reg [31 : 0] H4_reg;
   reg [31 : 0] H4_new;
-  reg [31 : 0] H5_reg;
-  reg [31 : 0] H5_new;
-  reg [31 : 0] H6_reg;
-  reg [31 : 0] H6_new;
-  reg [31 : 0] H7_reg;
-  reg [31 : 0] H7_new;
   reg          H_we;
   
   reg [6 : 0] t_ctr_reg;
@@ -176,8 +167,7 @@ module sha1_core(
   //----------------------------------------------------------------
   assign ready = ready_flag;
   
-  assign digest = {H0_reg, H1_reg, H2_reg, H3_reg,
-                   H4_reg, H5_reg, H6_reg, H7_reg};
+  assign digest = {H0_reg, H1_reg, H2_reg, H3_reg, H4_reg};
   
   assign digest_valid = digest_valid_reg;
   
@@ -205,11 +195,8 @@ module sha1_core(
           H2_reg           <= 32'h00000000;
           H3_reg           <= 32'h00000000;
           H4_reg           <= 32'h00000000;
-          H5_reg           <= 32'h00000000;
-          H6_reg           <= 32'h00000000;
-          H7_reg           <= 32'h00000000;
           digest_valid_reg <= 0;
-          t_ctr_reg        <= 6'b000000;
+          t_ctr_reg        <= 7'b0000000;
           sha1_ctrl_reg  <= CTRL_IDLE;
         end
       else
@@ -234,9 +221,6 @@ module sha1_core(
               H2_reg <= H2_new;
               H3_reg <= H3_new;
               H4_reg <= H4_new;
-              H5_reg <= H5_new;
-              H6_reg <= H6_new;
-              H7_reg <= H7_new;
             end
           
           if (t_ctr_we)
@@ -269,9 +253,6 @@ module sha1_core(
       H2_new = 32'h00000000;
       H3_new = 32'h00000000;
       H4_new = 32'h00000000;
-      H5_new = 32'h00000000;
-      H6_new = 32'h00000000;
-      H7_new = 32'h00000000;
       H_we = 0;
 
       if (digest_init)
@@ -281,9 +262,6 @@ module sha1_core(
           H2_new = H0_2;
           H3_new = H0_3;
           H4_new = H0_4;
-          H5_new = H0_5;
-          H6_new = H0_6;
-          H7_new = H0_7;
           H_we = 1;
         end
 
@@ -372,9 +350,6 @@ module sha1_core(
               c_new  = H0_2;
               d_new  = H0_3;
               e_new  = H0_4;
-              f_new  = H0_5;
-              g_new  = H0_6;
-              h_new  = H0_7;
               a_h_we = 1;
             end
           else
@@ -384,9 +359,6 @@ module sha1_core(
               c_new  = H2_reg;
               d_new  = H3_reg;
               e_new  = H4_reg;
-              f_new  = H5_reg;
-              g_new  = H6_reg;
-              h_new  = H7_reg;
               a_h_we = 1;
             end
         end
