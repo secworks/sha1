@@ -1,8 +1,8 @@
 //======================================================================
 //
-// tb_sha256.v
-// ----------------
-// Testbench for the SHA-256 top level wrapper.
+// tb_sha1.v
+// ---------
+// Testbench for the SHA-1 top level wrapper.
 //
 //
 // Copyright (c) 2013, Secworks Sweden AB
@@ -40,7 +40,7 @@
 //------------------------------------------------------------------
 `timescale 1ns/10ps
 
-module tb_sha256();
+module tb_sha1();
   
   //----------------------------------------------------------------
   // Internal constant and parameter definitions.
@@ -69,7 +69,7 @@ module tb_sha256();
   //----------------------------------------------------------------
   // Device Under Test.
   //----------------------------------------------------------------
-  sha256 dut(
+  sha1 dut(
              .clk(tb_clk),
              .reset_n(tb_reset_n),
              
@@ -189,24 +189,21 @@ module tb_sha256();
                          
     
   //----------------------------------------------------------------
-  // sha256_test
+  // sha1_test
   // The main test functionality. 
-  //
-  // Test cases taken from:
-  // http://csrc.nist.gov/groups/ST/toolkit/documents/Examples/SHA256.pdf
   //----------------------------------------------------------------
   initial
-    begin : sha256_test
-      $display("   -- Testbench for sha256 started --");
+    begin : sha1_test
+      $display("   -- Testbench for sha1 started --");
 
       init_sim();
       display_test_result();
       $display("*** Simulation done. ***");
       $finish;
-    end // sha256_test
-endmodule // tb_sha256
+    end // sha1_test
+endmodule // tb_sha1
 
 //======================================================================
-// EOF tb_sha256.v
+// EOF tb_sha1.v
 //======================================================================
 

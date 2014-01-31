@@ -1,8 +1,8 @@
 //======================================================================
 //
-// tb_sha256_core.v
+// tb_sha1_core.v
 // ----------------
-// Testbench for the SHA-256 core.
+// Testbench for the SHA-1 core.
 //
 //
 // Copyright (c) 2013, Secworks Sweden AB
@@ -40,7 +40,7 @@
 //------------------------------------------------------------------
 `timescale 1ns/10ps
 
-module tb_sha256_core();
+module tb_sha1_core();
   
   //----------------------------------------------------------------
   // Internal constant and parameter definitions.
@@ -71,7 +71,7 @@ module tb_sha256_core();
   //----------------------------------------------------------------
   // Device Under Test.
   //----------------------------------------------------------------
-  sha256_core dut(
+  sha1_core dut(
                    .clk(tb_clk),
                    .reset_n(tb_reset_n),
                  
@@ -135,7 +135,7 @@ module tb_sha256_core();
       $display("");
       
       $display("Control signals and counter:");
-      $display("sha256_ctrl_reg = 0x%02x", dut.sha256_ctrl_reg);
+      $display("sha1_ctrl_reg = 0x%02x", dut.sha1_ctrl_reg);
       $display("digest_init     = 0x%01x, digest_update = 0x%01x", 
                dut.digest_init, dut.digest_update);
       $display("state_init      = 0x%01x, state_update  = 0x%01x", 
@@ -165,7 +165,7 @@ module tb_sha256_core();
 
       $display("wmem data:");
       $display("w_addr = 0x%02x,       w_data  = 0x%08x", dut.w_mem.addr, dut.w_mem.w_tmp);
-      $display("w_ctr  = 0x%02x,       w_state = 0x%01x", dut.w_mem.w_ctr_reg, dut.w_mem.sha256_w_mem_ctrl_reg);
+      $display("w_ctr  = 0x%02x,       w_state = 0x%01x", dut.w_mem.w_ctr_reg, dut.w_mem.sha1_w_mem_ctrl_reg);
       $display("d0     = 0x%02x, d1      = 0x%01x", dut.w_mem.d0, dut.w_mem.d1);
       $display("w_7    = 0x%02x, w_16    = 0x%01x", dut.w_mem.w_7, dut.w_mem.w_16);
       $display("");
@@ -348,14 +348,11 @@ module tb_sha256_core();
                          
     
   //----------------------------------------------------------------
-  // sha256_core_test
+  // sha1_core_test
   // The main test functionality. 
-  //
-  // Test cases taken from:
-  // http://csrc.nist.gov/groups/ST/toolkit/documents/Examples/SHA256.pdf
   //----------------------------------------------------------------
   initial
-    begin : sha256_core_test
+    begin : sha1_core_test
       reg [511 : 0] tc1;
       reg [255 : 0] res1;
 
@@ -364,7 +361,7 @@ module tb_sha256_core();
       reg [511 : 0] tc2_2;
       reg [255 : 0] res2_2;
       
-      $display("   -- Testbench for sha256 core started --");
+      $display("   -- Testbench for sha1 core started --");
 
       init_sim();
       dump_dut_state();
@@ -388,9 +385,9 @@ module tb_sha256_core();
       display_test_result();
       $display("*** Simulation done.");
       $finish;
-    end // sha256_core_test
-endmodule // tb_sha256_core
+    end // sha1_core_test
+endmodule // tb_sha1_core
 
 //======================================================================
-// EOF tb_sha256_core.v
+// EOF tb_sha1_core.v
 //======================================================================

@@ -1,8 +1,8 @@
 //======================================================================
 //
-// tb_sha256_w_mem.v
-// -----------------
-// Testbench for the SHA-256 W memory module.
+// Tb_sha1_w_mem.v
+// ---------------
+// Testbench for the SHA-1 W memory module.
 //
 //
 // Copyright (c) 2013, Secworks Sweden AB
@@ -40,8 +40,9 @@
 //------------------------------------------------------------------
 `timescale 1ns/10ps
 
-module tb_sha256_w_mem();
+module tb_sha1_w_mem();
 
+  
   //----------------------------------------------------------------
   // Internal constant and parameter definitions.
   //----------------------------------------------------------------
@@ -76,7 +77,7 @@ module tb_sha256_w_mem();
   //----------------------------------------------------------------
   // Device Under Test.
   //----------------------------------------------------------------
-  sha256_w_mem dut(
+  sha1_w_mem dut(
                    .clk(tb_clk),
                    .reset_n(tb_reset_n),
                    
@@ -118,7 +119,7 @@ module tb_sha256_w_mem();
       
       if (DEBUG)
         begin
-          $display("dut ctrl_state = %02x:", dut.sha256_w_mem_ctrl_reg);
+          $display("dut ctrl_state = %02x:", dut.sha1_w_mem_ctrl_reg);
           $display("dut w_ctr      = %02x:", dut.w_ctr_reg);
         end
     end // dut_monitor
@@ -351,7 +352,7 @@ module tb_sha256_w_mem();
   //----------------------------------------------------------------
   initial
     begin : w_mem_test
-      $display("   -- Testbench for sha256 w memory started --");
+      $display("   -- Testbench for sha1 w memory started --");
       init_sim();
 
       dump_mem();
@@ -370,5 +371,5 @@ module tb_sha256_w_mem();
 endmodule // w_mem_test
   
 //======================================================================
-// EOF tb_sha256_w_mem.v
+// EOF tb_sha1_w_mem.v
 //======================================================================
