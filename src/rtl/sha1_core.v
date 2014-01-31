@@ -124,7 +124,6 @@ module sha1_core(
   reg ready_flag;
 
   reg [31 : 0] t;
-  reg [31 : 0] t2;
 
   wire [31 : 0] k_data;
 
@@ -186,7 +185,7 @@ module sha1_core(
           H4_reg           <= 32'h00000000;
           digest_valid_reg <= 0;
           t_ctr_reg        <= 7'b0000000;
-          sha1_ctrl_reg  <= CTRL_IDLE;
+          sha1_ctrl_reg    <= CTRL_IDLE;
         end
       else
         begin
@@ -269,38 +268,27 @@ module sha1_core(
   // The logic for the T function.
   //----------------------------------------------------------------
   always @*
-    begin : t1_logic
-      reg [31 : 0] sum1;
-      reg [31 : 0] ch;
+    begin : t_logic
+      reg [31 : 0] a_rotl5;
+      reg [31 : 0] ft;
 
-      sum1 = {e_reg[5  : 0], e_reg[31 :  6]} ^ 
-             {e_reg[10 : 0], e_reg[31 : 11]} ^ 
-             {e_reg[24 : 0], e_reg[31 : 25]};
+      a_rotl5 = {a_reg[26 : 0], a_reg[31 : 27]};
 
-      ch = (e_reg & f_reg) ^ ((~e_reg) & g_reg);
-      
-      t1 = h_reg + sum1 + ch + w_data + k_data;
-    end // t1_logic
+      if (t_ctr_reg < 20)
+        begin
+          ft = (b_reg || c_reg) ^ (~b_reg || d_reg);
+        end
+      else if ((t_ctr_reg > 39) && (t_ctr_reg < 60))
+        begin
+          ft = (b_reg || c_reg) ^ (b_reg || d_reg) ^ (c_reg || d_reg);
+        end
+      else
+        begin
+          ft = b_reg ^ c_reg ^ d_reg;
+        end
 
-
-  //----------------------------------------------------------------
-  // t2_logic
-  //
-  // The logic for the T2 function
-  //----------------------------------------------------------------
-  always @*
-    begin : t2_logic
-      reg [31 : 0] sum0;
-      reg [31 : 0] maj;
-
-      sum0 = {a_reg[1  : 0], a_reg[31 :  2]} ^
-             {a_reg[12 : 0], a_reg[31 : 13]} ^
-             {a_reg[21 : 0], a_reg[31 : 22]};
-
-      maj = (a_reg & b_reg) ^ (a_reg & c_reg) ^ (b_reg & c_reg);
-      
-      t2 = sum0 + maj;
-    end // t2_logic
+      t1 = a_rotl5 + ft + e_reg + k_data + w_data;
+    end // t_logic
   
   
   //----------------------------------------------------------------
