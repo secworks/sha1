@@ -43,7 +43,7 @@ module sha1_w_mem(
                   input wire           init,
 
                   input wire [511 : 0] block,
-                  input wire  [5 : 0]  addr,
+                  input wire  [6 : 0]  addr,
 
                   output wire          ready,
                   output wire [31 : 0] w
@@ -62,7 +62,7 @@ module sha1_w_mem(
   //----------------------------------------------------------------
   // Registers including update variables and write enable.
   //----------------------------------------------------------------
-  reg [31 : 0] w_mem [0 : 63];
+  reg [31 : 0] w_mem [0 : 79];
   reg w_mem_we;
   reg w0_w15_we;
   
