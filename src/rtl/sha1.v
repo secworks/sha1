@@ -83,9 +83,6 @@ module sha1(
   parameter ADDR_DIGEST2   = 8'h22;
   parameter ADDR_DIGEST3   = 8'h23;
   parameter ADDR_DIGEST4   = 8'h24;
-  parameter ADDR_DIGEST5   = 8'h25;
-  parameter ADDR_DIGEST6   = 8'h26;
-  parameter ADDR_DIGEST7   = 8'h27;
 
   
   //----------------------------------------------------------------
@@ -130,7 +127,7 @@ module sha1(
   reg [31 : 0] block15_reg;
   reg          block15_we;
 
-  reg [255 : 0] digest_reg;
+  reg [159 : 0] digest_reg;
 
   reg digest_valid_reg;
 
@@ -142,7 +139,7 @@ module sha1(
   wire           core_next;
   wire           core_ready;
   wire [511 : 0] core_block;
-  wire [255 : 0] core_digest;
+  wire [159 : 0] core_digest;
   wire           core_digest_valid;
 
   reg [31 : 0]   tmp_data_out;
@@ -195,7 +192,7 @@ module sha1(
           init_reg         <= 0;
           next_reg         <= 0;
           ready_reg        <= 0;
-          digest_reg       <= 256'h0000000000000000000000000000000000000000000000000000000000000000;
+          digest_reg       <= 256'h0000000000000000000000000000000000000000;
           digest_valid_reg <= 0;
           block0_reg       <= 32'h00000000;
           block1_reg       <= 32'h00000000;
@@ -534,40 +531,25 @@ module sha1(
 
                 ADDR_DIGEST0:
                   begin
-                    tmp_data_out = digest_reg[255 : 224];
+                    tmp_data_out = digest_reg[159 : 128];
                   end
 
                 ADDR_DIGEST1:
                   begin
-                    tmp_data_out = digest_reg[223 : 192];
+                    tmp_data_out = digest_reg[127 :  96];
                   end
 
                 ADDR_DIGEST2:
                   begin
-                    tmp_data_out = digest_reg[191 : 160];
+                    tmp_data_out = digest_reg[95  :  64];
                   end
 
                 ADDR_DIGEST3:
                   begin
-                    tmp_data_out = digest_reg[159 : 128];
-                  end
-
-                ADDR_DIGEST4:
-                  begin
-                    tmp_data_out = digest_reg[127 :  96];
-                  end
-
-                ADDR_DIGEST5:
-                  begin
-                    tmp_data_out = digest_reg[95  :  64];
-                  end
-
-                ADDR_DIGEST6:
-                  begin
                     tmp_data_out = digest_reg[63  :  32];
                   end
 
-                ADDR_DIGEST7:
+                ADDR_DIGEST4:
                   begin
                     tmp_data_out = digest_reg[31  :   0];
                   end
