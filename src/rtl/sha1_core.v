@@ -47,7 +47,7 @@ module sha1_core(
                  
                  output wire           ready,
                   
-                 output wire [255 : 0] digest,
+                 output wire [159 : 0] digest,
                  output wire           digest_valid
                 );
 
@@ -287,7 +287,7 @@ module sha1_core(
           ft = b_reg ^ c_reg ^ d_reg;
         end
 
-      t1 = a_rotl5 + ft + e_reg + k_data + w_data;
+      t = a_rotl5 + ft + e_reg + k_data + w_data;
     end // t_logic
   
   

@@ -63,7 +63,7 @@ module tb_sha1_core();
   reg            tb_next;
   reg [511 : 0]  tb_block;
   wire           tb_ready;
-  wire [255 : 0] tb_digest;
+  wire [159 : 0] tb_digest;
   wire           tb_digest_valid;
   
   
@@ -145,20 +145,15 @@ module tb_sha1_core();
       $display("");
 
       $display("State registers:");
-      $display("a_reg = 0x%08x, b_reg = 0x%08x, c_reg = 0x%08x, d_reg = 0x%08x", 
-               dut.a_reg, dut.b_reg, dut.c_reg, dut.d_reg);
-      $display("e_reg = 0x%08x, f_reg = 0x%08x, g_reg = 0x%08x, h_reg = 0x%08x", 
-               dut.e_reg, dut.f_reg, dut.g_reg, dut.h_reg);
+      $display("a_reg = 0x%08x, b_reg = 0x%08x, c_reg = 0x%08x, d_reg = 0x%08x, e_reg = 0x%08x", 
+               dut.a_reg, dut.b_reg, dut.c_reg, dut.d_reg,  dut.e_reg);
       $display("");
-      $display("a_new = 0x%08x, b_new = 0x%08x, c_new = 0x%08x, d_new = 0x%08x", 
-               dut.a_new, dut.b_new, dut.c_new, dut.d_new);
-      $display("e_new = 0x%08x, f_new = 0x%08x, g_new = 0x%08x, h_new = 0x%08x", 
-               dut.e_new, dut.f_new, dut.g_new, dut.h_new);
+      $display("a_new = 0x%08x, b_new = 0x%08x, c_new = 0x%08x, d_new = 0x%08x, e_new = 0x%08x", 
+               dut.a_new, dut.b_new, dut.c_new, dut.d_new, dut.e_new);
       $display("");
 
       $display("State update values:");
-      $display("w  = 0x%08x, k  = 0x%08x", dut.w_data, dut.k_data);
-      $display("t1 = 0x%08x, t2 = 0x%08x", dut.t1, dut.t2);
+      $display("w = 0x%08x, k = 0x%08x, t = 0x%08x", dut.w_data, dut.k_data,  dut.t);
       $display("");
 
       $display("wmem data:");
