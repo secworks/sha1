@@ -45,7 +45,7 @@ module tb_sha1_core();
   //----------------------------------------------------------------
   // Internal constant and parameter definitions.
   //----------------------------------------------------------------
-  parameter DEBUG = 1;
+  parameter DEBUG = 0;
 
   parameter CLK_HALF_PERIOD = 2;
   
@@ -127,7 +127,7 @@ module tb_sha1_core();
 
       $display("ready  = 0x%01x, valid = 0x%01x", 
                dut.ready, dut.digest_valid);
-      $display("digest = 0x%064x", dut.digest);
+      $display("digest = 0x%040x", dut.digest);
       $display("H0_reg = 0x%08x, H1_reg = 0x%08x, H2_reg = 0x%08x, H3_reg = 0x%08x, H4_reg = 0x%08x", 
                dut.H0_reg, dut.H1_reg, dut.H2_reg, dut.H3_reg, dut.H4_reg);
       $display("");
@@ -239,7 +239,7 @@ module tb_sha1_core();
   //----------------------------------------------------------------
   task single_block_test(input [7 : 0] tc_number,
                          input [511 : 0] block,
-                         input [255 : 0] expected);
+                         input [159 : 0] expected);
    begin
      $display("*** TC %0d single block test case started.", tc_number);
      tc_ctr = tc_ctr + 1;
@@ -259,8 +259,8 @@ module tb_sha1_core();
      else
        begin
          $display("*** ERROR: TC %0d NOT successful.", tc_number);
-         $display("Expected: 0x%064x", expected);
-         $display("Got:      0x%064x", tb_digest);
+         $display("Expected: 0x%040x", expected);
+         $display("Got:      0x%040x", tb_digest);
          $display("");
          
          error_ctr = error_ctr + 1;
@@ -270,14 +270,17 @@ module tb_sha1_core();
 
   
   //----------------------------------------------------------------
+  // double_block_test
+  //
+  // Test message consisting of two blocks.
   //----------------------------------------------------------------
   task double_block_test(input [7 : 0] tc_number,
                          input [511 : 0] block1,
-                         input [255 : 0] expected1,
+                         input [159 : 0] expected1,
                          input [511 : 0] block2,
-                         input [255 : 0] expected2);
+                         input [159 : 0] expected2);
 
-     reg [255 : 0] db_digest1;
+     reg [159 : 0] db_digest1;
      reg           db_error;
    begin
      $display("*** TC %0d double block test case started.", tc_number);
@@ -309,8 +312,8 @@ module tb_sha1_core();
      else
        begin
          $display("*** ERROR: TC %0d first block NOT successful", tc_number);
-         $display("Expected: 0x%064x", expected1);
-         $display("Got:      0x%064x", db_digest1);
+         $display("Expected: 0x%040x", expected1);
+         $display("Got:      0x%040x", db_digest1);
          $display("");
          db_error = 1;
        end
@@ -323,8 +326,8 @@ module tb_sha1_core();
      else
        begin
          $display("*** ERROR: TC %0d second block NOT successful", tc_number);
-         $display("Expected: 0x%064x", expected2);
-         $display("Got:      0x%064x", tb_digest);
+         $display("Expected: 0x%040x", expected2);
+         $display("Got:      0x%040x", tb_digest);
          $display("");
          db_error = 1;
        end
@@ -334,7 +337,7 @@ module tb_sha1_core();
          error_ctr = error_ctr + 1;
        end
    end
-  endtask // single_block_test
+  endtask // double_block_test
                          
     
   //----------------------------------------------------------------
@@ -344,12 +347,12 @@ module tb_sha1_core();
   initial
     begin : sha1_core_test
       reg [511 : 0] tc1;
-      reg [255 : 0] res1;
+      reg [159 : 0] res1;
 
       reg [511 : 0] tc2_1;
-      reg [255 : 0] res2_1;
+      reg [159 : 0] res2_1;
       reg [511 : 0] tc2_2;
-      reg [255 : 0] res2_2;
+      reg [159 : 0] res2_2;
       
       $display("   -- Testbench for sha1 core started --");
 
