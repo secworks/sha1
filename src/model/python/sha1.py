@@ -2,13 +2,15 @@
 # -*- coding: utf-8 -*-
 #=======================================================================
 #
-# sha256.py
+# sha1.py
 # ---------
-# Simple, pure Python model of the SHA-256 hash function. Used as a
+# Simple, pure Python model of the SHA-1 function. Used as a
 # reference for the HW implementation. The code follows the structure
 # of the HW implementation as much as possible.
 #
+#
 # Author: Joachim Strömbergson
+# (c) 2014 Secworks Sweden AB
 # 
 # Redistribution and use in source and binary forms, with or 
 # without modification, are permitted provided that the following 
@@ -51,7 +53,7 @@ import sys
 #-------------------------------------------------------------------
 # ChaCha()
 #-------------------------------------------------------------------
-class SHA256():
+class SHA1():
     def __init__(self, verbose = 0):
         self.verbose = verbose
         self.H = [0] * 8
@@ -99,7 +101,7 @@ class SHA256():
             self._print_state(0)
 
         for i in range(64):
-            self._sha256_round(i)
+            self._sha1_round(i)
             if self.verbose:
                 self._print_state(i)
 
@@ -143,7 +145,7 @@ class SHA256():
         print("")
 
 
-    def _sha256_round(self, round):
+    def _sha1_round(self, round):
         self.k = self.K[round]
         self.w = self.W[round]
         self.t1 = self._T1(self.e, self.f, self.g, self.h, self.k, self.w)
@@ -234,7 +236,7 @@ def main():
     print("---------------------------------")
     print
 
-    my_sha256 = SHA256(verbose=1);
+    my_sha1 = SHA1(verbose=1);
 
     # TC1: NIST testcase with message "abc"
     TC1_block = [0x61626380, 0x00000000, 0x00000000, 0x00000000, 
@@ -245,9 +247,9 @@ def main():
     TC1_expected = [0xBA7816BF, 0x8F01CFEA, 0x414140DE, 0x5DAE2223,
                     0xB00361A3, 0x96177A9C, 0xB410FF61, 0xF20015AD]
     
-    my_sha256.init()
-    my_sha256.next(TC1_block)
-    my_digest = my_sha256.get_digest()
+    my_sha1.init()
+    my_sha1.next(TC1_block)
+    my_digest = my_sha1.get_digest()
     compare_digests(my_digest, TC1_expected)
 
     
@@ -262,5 +264,5 @@ if __name__=="__main__":
     sys.exit(main())
 
 #=======================================================================
-# EOF sha256.py
+# EOF sha1.py
 #=======================================================================
