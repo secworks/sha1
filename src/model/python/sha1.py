@@ -56,7 +56,7 @@ import sys
 class SHA1():
     def __init__(self, verbose = 0):
         self.verbose = verbose
-        self.H = [0] * 8
+        self.H = [0] * 5
         self.t1 = 0
         self.t2 = 0
         self.a = 0
@@ -68,29 +68,14 @@ class SHA1():
         self.g = 0
         self.h = 0
         self.w = 0
-        self.W = [0] * 64
+        self.W = [0] * 80
         self.k = 0
-        self.K = [0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5,
-                  0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
-                  0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3,
-                  0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
-                  0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc,
-                  0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
-                  0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7,
-                  0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
-                  0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13,
-                  0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
-                  0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3,
-                  0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
-                  0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5,
-                  0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
-                  0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208,
-                  0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2]
+        self.K = [0x5a827999, 0x6ed9eba1, 0x8f1bbcdc, 0xca62c1d6d]
         
         
     def init(self):
-        self.H = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
-                  0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19]
+        self.H = [0x67452301, 0xefcdab89, 0x98badcfe,
+                  0x10325476, 0xc3d2e1f0]
         
 
     def next(self, block):
@@ -118,9 +103,6 @@ class SHA1():
         self.c = self.H[2] 
         self.d = self.H[3] 
         self.e = self.H[4] 
-        self.f = self.H[5] 
-        self.g = self.H[6] 
-        self.h = self.H[7]
     
     
     def _update_digest(self):
@@ -129,9 +111,6 @@ class SHA1():
         self.H[2] = (self.H[2] + self.c) & 0xffffffff 
         self.H[3] = (self.H[3] + self.d) & 0xffffffff 
         self.H[4] = (self.H[4] + self.e) & 0xffffffff 
-        self.H[5] = (self.H[5] + self.f) & 0xffffffff 
-        self.H[6] = (self.H[6] + self.g) & 0xffffffff 
-        self.H[7] = (self.H[7] + self.h) & 0xffffffff 
 
 
     def _print_state(self, round):
@@ -140,25 +119,27 @@ class SHA1():
         print("k  = 0x%08x, w  = 0x%08x" % (self.k, self.w))
         print("a  = 0x%08x, b  = 0x%08x" % (self.a, self.b))
         print("c  = 0x%08x, d  = 0x%08x" % (self.c, self.d))
-        print("e  = 0x%08x, f  = 0x%08x" % (self.e, self.f))
-        print("g  = 0x%08x, h  = 0x%08x" % (self.g, self.h))
+        print("e  = 0x%08x" % (self.e))
         print("")
 
 
     def _sha1_round(self, round):
-        self.k = self.K[round]
-        self.w = self.W[round]
-        self.t1 = self._T1(self.e, self.f, self.g, self.h, self.k, self.w)
+        self.k = self._next_k(round)
+        self.w = self._next_w(round)
+        self.t1 = self._T1(self.a, self.b, self.c, self.d, self.k, self.w)
         self.t2 = self._T2(self.a, self.b, self.c)
-        self.h = self.g
-        self.g = self.f
-        self.f = self.e
         self.e = (self.d + self.t1) & 0xffffffff
         self.d = self.c
         self.c = self.b
         self.b = self.a
         self.a = (self.t1 + self.t2) & 0xffffffff
 
+
+    def _next_k(self, round):
+        return 0xdeadbeef
+
+    def _next_w(self, round):
+        return 0xabcd0123
 
     def _W_schedule(self, block):
         for i in range(64):
