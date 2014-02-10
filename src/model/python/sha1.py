@@ -225,8 +225,8 @@ def main():
                  0x00000000, 0x00000000, 0x00000000, 0x00000000,
                  0x00000000, 0x00000000, 0x00000000, 0x00000018]
     
-    TC1_expected = [0xBA7816BF, 0x8F01CFEA, 0x414140DE, 0x5DAE2223,
-                    0xB00361A3, 0x96177A9C, 0xB410FF61, 0xF20015AD]
+    TC1_expected = [0xa9993e36, 0x4706816a, 0xba3e2571,
+                    0x7850c26c, 0x9cd0d89d]
     
     my_sha1.init()
     my_sha1.next(TC1_block)
