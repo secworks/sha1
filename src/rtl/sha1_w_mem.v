@@ -52,6 +52,8 @@ module sha1_w_mem(
   // Registers including update variables and write enable.
   //----------------------------------------------------------------
   reg [31 : 0] w_mem [0 : 15];
+  reg [31 : 0] w_mem_new;
+  reg          w_mem_we;
   
   
   //----------------------------------------------------------------
@@ -114,6 +116,11 @@ module sha1_w_mem(
               w_mem[14] <= block[63  :  32];
               w_mem[15] <= block[31  :   0];
             end
+
+          if (w_mem_we)
+            begin
+              w_mem[addr[3 : 0]] <= w_mem_new;
+            end
         end
     end // reg_update
 
@@ -131,10 +138,14 @@ module sha1_w_mem(
       reg [3  :  0] s8_addr;
       reg [3  :  0] s2_addr;
       reg [31 :  0] pre_w;
+
+      w_mem_new = 32'h00000000;
+      w_mem_we  = 0;
       
-      s13_addr = (addr + 13);
-      s8_addr  = (addr +  8);
-      s2_addr  = (addr +  2);
+      s13_addr = (addr + 4'hd);
+      s8_addr  = (addr + 4'h8);
+      s2_addr  = (addr + 4'h2);
+      
       pre_w = w_mem[s13_addr] ^ w_mem[s8_addr] ^ w_mem[s2_addr];
       
       if (addr < 16)
@@ -144,6 +155,8 @@ module sha1_w_mem(
       else
         begin
           w_tmp = {pre_w[30 : 0], pre_w[31]};
+          w_mem_new = w_tmp;
+          w_mem_we  = 1;
         end
     end // external_addr_mux
 

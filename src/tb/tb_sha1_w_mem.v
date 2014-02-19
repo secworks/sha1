@@ -46,7 +46,7 @@ module tb_sha1_w_mem();
   //----------------------------------------------------------------
   // Internal constant and parameter definitions.
   //----------------------------------------------------------------
-  parameter DEBUG          = 0;
+  parameter DEBUG          = 1;
   parameter DISPLAY_CYCLES = 0;
 
   parameter CLK_HALF_PERIOD = 2;
@@ -60,8 +60,8 @@ module tb_sha1_w_mem();
   //----------------------------------------------------------------
   // Wires.
   //----------------------------------------------------------------
-  reg            tb_clk;
-  reg            tb_reset_n;
+  reg           tb_clk;
+  reg           tb_reset_n;
 
   reg           tb_init;
   reg [511 : 0] tb_block;
@@ -117,8 +117,14 @@ module tb_sha1_w_mem();
       
       if (DEBUG)
         begin
-          $display("dut ctrl_state = %02x:", dut.sha1_w_mem_ctrl_reg);
-          $display("dut w_ctr      = %02x:", dut.w_ctr_reg);
+          $display("addr:      0x%02x:", dut.addr);
+          $display("addr4:     0x%02x:", dut.addr[3 : 0]);
+          $display("s13_addr:  0x%02x:", dut.external_addr_mux.s13_addr);
+          $display("s8_addr:   0x%02x:", dut.external_addr_mux.s8_addr);
+          $display("s2_addr:   0x%02x:", dut.external_addr_mux.s2_addr);
+          $display("pre_w  :   0x%08x:", dut.external_addr_mux.pre_w);
+          $display("w_mem_new: 0x%08x:", dut.w_mem_new);
+          $display("w_mem_we:  0x%x:", dut.w_mem_we);
         end
     end // dut_monitor
       
