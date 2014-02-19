@@ -85,7 +85,7 @@ class SHA1():
             print("State after init:")
             self._print_state(0)
 
-        for i in range(64):
+        for i in range(80):
             self._sha1_round(i)
             if self.verbose:
                 self._print_state(i)
@@ -142,7 +142,7 @@ class SHA1():
         return 0xabcd0123
 
     def _W_schedule(self, block):
-        for i in range(64):
+        for i in range(80):
             if (i < 16):
                 self.W[i] = block[i]
             else:
