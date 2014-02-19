@@ -57,21 +57,15 @@ class SHA1():
     def __init__(self, verbose = 0):
         self.verbose = verbose
         self.H = [0] * 5
-        self.t1 = 0
-        self.t2 = 0
+        self.T = 0
         self.a = 0
         self.b = 0
         self.c = 0
         self.d = 0
         self.e = 0
-        self.f = 0
-        self.g = 0
-        self.h = 0
-        self.w = 0
         self.W = [0] * 80
         self.k = 0
-        self.K = [0x5a827999, 0x6ed9eba1, 0x8f1bbcdc, 0xca62c1d6d]
-        
+
         
     def init(self):
         self.H = [0x67452301, 0xefcdab89, 0x98badcfe,
@@ -115,44 +109,48 @@ class SHA1():
 
     def _print_state(self, round):
         print("State at round 0x%02x:" % round)
-        print("t1 = 0x%08x, t2 = 0x%08x" % (self.t1, self.t2))
-        print("k  = 0x%08x, w  = 0x%08x" % (self.k, self.w))
-        print("a  = 0x%08x, b  = 0x%08x" % (self.a, self.b))
-        print("c  = 0x%08x, d  = 0x%08x" % (self.c, self.d))
-        print("e  = 0x%08x" % (self.e))
+        print("a = 0x%08x, b  = 0x%08x" % (self.a, self.b))
+        print("c = 0x%08x, d  = 0x%08x" % (self.c, self.d))
+        print("e = 0x%08x" % (self.e))
         print("")
 
 
     def _sha1_round(self, round):
-        self.k = self._next_k(round)
-        self.w = self._next_w(round)
-        self.t1 = self._T1(self.a, self.b, self.c, self.d, self.k, self.w)
-        self.t2 = self._T2(self.a, self.b, self.c)
-        self.e = (self.d + self.t1) & 0xffffffff
+        if round <= 19:
+            self.k = 0x5a827999        
+            self.f = self._Ch(self.b, self.c, self.d)
+
+        elif 20 <= round <= 30:
+            self.k = 0x6ed9eba1
+            self.f = self._Parity(self.b, self.c, self.d)
+
+        elif 40 <= round <= 59:
+            self.k = 0x8f1bbcdc
+            self.f = self._Maj(self.b, self.c, self.d)
+
+        else:
+            self.k = 0xca62c1d6
+            self.f = self._Parity(self.b, self.c, self.d)
+        
+        self.T = self._rotl32(self.a, 5) + self.f + self.k + self.W[round]
+        self.e = self.d
         self.d = self.c
-        self.c = self.b
+        self.c = self._rotl32(self.b, 30)
         self.b = self.a
-        self.a = (self.t1 + self.t2) & 0xffffffff
+        self.a = self.T
 
-
-    def _next_k(self, round):
-        return 0xdeadbeef
-
-    def _next_w(self, round):
-        return 0xabcd0123
 
     def _W_schedule(self, block):
+        # Expand the block into 80 words before round operations.
         for i in range(80):
             if (i < 16):
                 self.W[i] = block[i]
             else:
-                self.W[i] = (self._delta1(self.W[(i - 2)]) +
-                             self.W[(i - 7)] + 
-                             self._delta0(self.W[(i - 15)]) +
-                             self.W[(i - 16)]) & 0xffffffff
+                self.W[i] = self._rotl32((self.W[(i - 3)] ^ self.W[(i - 8)] ^
+                                          self.W[(i - 14)] ^ self.W[(i - 16)]), 1)
         if (self.verbose):
             print("W after schedule:")
-            for i in range(64):
+            for i in range(80):
                 print("W[%02d] = 0x%08x" % (i, self.W[i]))
             print("")
 
@@ -164,36 +162,12 @@ class SHA1():
     def _Maj(self, x, y, z):
         return (x & y) ^ (x & z) ^ (y & z)
 
-    def _sigma0(self, x):
-        return (self._rotr32(x, 2) ^ self._rotr32(x, 13) ^ self._rotr32(x, 22))
 
+    def _Parity(self, x, y, z):
+        return (x ^ y ^ z)
 
-    def _sigma1(self, x):
-        return (self._rotr32(x, 6) ^ self._rotr32(x, 11) ^ self._rotr32(x, 25))
-
-
-    def _delta0(self, x):
-        return (self._rotr32(x, 7) ^ self._rotr32(x, 18) ^ self._shr32(x, 3))
-
-
-    def _delta1(self, x):
-        return (self._rotr32(x, 17) ^ self._rotr32(x, 19) ^ self._shr32(x, 10))
-    
-
-    def _T1(self, e, f, g, h, k, w):
-        return (h + self._sigma1(e) + self._Ch(e, f, g) + k + w) & 0xffffffff
-
-
-    def _T2(self, a, b, c):
-        return (self._sigma0(a) + self._Maj(a, b, c)) & 0xffffffff
-
-
-    def _rotr32(self, n, r):
-        return ((n >> r) | (n << (32 - r))) & 0xffffffff
-
-    
-    def _shr32(self, n, r):
-        return (n >> r)
+    def _rotl32(self, n, r):
+        return ((n << r) | (n >> (32 - r))) & 0xffffffff
 
 
 def compare_digests(digest, expected):
