@@ -75,15 +75,8 @@ class SHA1():
     def next(self, block):
         self._W_schedule(block)
         self._copy_digest()
-        if self.verbose:
-            print("State after init:")
-            self._print_state(0)
-
         for i in range(80):
             self._sha1_round(i)
-            if self.verbose:
-                self._print_state(i)
-
         self._update_digest()
 
 
@@ -107,20 +100,12 @@ class SHA1():
         self.H[4] = (self.H[4] + self.e) & 0xffffffff 
 
 
-    def _print_state(self, round):
-        print("State at round 0x%02x:" % round)
-        print("a = 0x%08x, b  = 0x%08x" % (self.a, self.b))
-        print("c = 0x%08x, d  = 0x%08x" % (self.c, self.d))
-        print("e = 0x%08x" % (self.e))
-        print("")
-
-
     def _sha1_round(self, round):
         if round <= 19:
             self.k = 0x5a827999        
             self.f = self._Ch(self.b, self.c, self.d)
 
-        elif 20 <= round <= 30:
+        elif 20 <= round <= 39:
             self.k = 0x6ed9eba1
             self.f = self._Parity(self.b, self.c, self.d)
 
@@ -131,13 +116,27 @@ class SHA1():
         elif 60 <= round <= 79:
             self.k = 0xca62c1d6
             self.f = self._Parity(self.b, self.c, self.d)
+
+        if self.verbose:
+            print("Round %0d" % round)
+            print("Round input values:")
+            print("a = 0x%08x, b = 0x%08x, c = 0x%08x" % (self.a, self.b, self.c))
+            print("d = 0x%08x, e = 0x%08x" % (self.d, self.e))
+            print("f = 0x%08x, k = 0x%08x, w = 0x%08x" % (self.f, self.k, self.W[round]))
+            
         
-        self.T = self._rotl32(self.a, 5) + self.f + self.k + self.W[round]
+        self.T = (self._rotl32(self.a, 5) + self.f + self.e + self.k + self.W[round]) & 0xffffffff
         self.e = self.d
         self.d = self.c
         self.c = self._rotl32(self.b, 30)
         self.b = self.a
         self.a = self.T
+
+        if self.verbose:
+            print("Round output values:")
+            print("a = 0x%08x, b = 0x%08x, c = 0x%08x" % (self.a, self.b, self.c))
+            print("d = 0x%08x, e = 0x%08x" % (self.d, self.e))
+            print("")
 
 
     def _W_schedule(self, block):
