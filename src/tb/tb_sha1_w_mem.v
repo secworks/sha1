@@ -65,7 +65,7 @@ module tb_sha1_w_mem();
 
   reg           tb_init;
   reg [511 : 0] tb_block;
-  reg [7 : 0]   tb_addr;
+  reg [6 : 0]   tb_addr;
   wire          tb_ready;
   wire [31 : 0] tb_w;
 

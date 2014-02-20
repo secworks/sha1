@@ -44,7 +44,7 @@ module sha1_w_mem(
                   input wire [511 : 0] block,
                   output wire          ready,
 
-                  input wire [7 :   0] addr,
+                  input wire [6 : 0]   addr,
                   output wire [31 : 0] w
                  );
 
@@ -65,8 +65,8 @@ module sha1_w_mem(
   reg [31 : 0] w_mem_new;
   reg          w_mem_we;
   
-  reg [7 : 0] w_ctr_reg;
-  reg [7 : 0] w_ctr_new;
+  reg [6 : 0] w_ctr_reg;
+  reg [6 : 0] w_ctr_new;
   reg         w_ctr_we;
   reg         w_ctr_inc;
   reg         w_ctr_set;
@@ -81,7 +81,7 @@ module sha1_w_mem(
   //----------------------------------------------------------------
   reg [31 : 0] w_tmp;
   reg [31 : 0] w_new;
-  reg [7 : 0]  w_addr;
+  reg [6 : 0]  w_addr;
   reg          w_update;
   reg          ready_tmp;
   
@@ -104,7 +104,7 @@ module sha1_w_mem(
     begin : reg_update
       if (!reset_n)
         begin
-          w_ctr_reg           <= 8'h00;
+          w_ctr_reg           <= 7'b0000000;
           sha1_w_mem_ctrl_reg <= CTRL_IDLE;
         end
       else
