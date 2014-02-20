@@ -45,7 +45,7 @@ module tb_sha1_core();
   //----------------------------------------------------------------
   // Internal constant and parameter definitions.
   //----------------------------------------------------------------
-  parameter DEBUG = 1;
+  parameter DEBUG = 0;
 
   parameter CLK_HALF_PERIOD = 2;
   
@@ -369,7 +369,7 @@ module tb_sha1_core();
       // TC2: Double block message.
       // "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq"
       tc2_1 = 512'h6162636462636465636465666465666765666768666768696768696A68696A6B696A6B6C6A6B6C6D6B6C6D6E6C6D6E6F6D6E6F706E6F70718000000000000000;
-      res2_1 = 160'h0000000000000000000000000000000000000000;
+      res2_1 = 160'hf4286818c37b27ae0408f581846771484a566572;
       
       tc2_2 = 512'h000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001C0;
       res2_2 = 160'h84983e441c3bd26ebaae4aa1f95129e5e54670f1;
