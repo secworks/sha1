@@ -65,7 +65,7 @@ module tb_sha1_w_mem();
 
   reg           tb_init;
   reg [511 : 0] tb_block;
-  reg [6 : 0]   tb_addr;
+  reg [7 : 0]   tb_addr;
   wire          tb_ready;
   wire [31 : 0] tb_w;
 
@@ -83,7 +83,8 @@ module tb_sha1_w_mem();
                  
                  .init(tb_init),
                  .block(tb_block),
-
+                 .ready(tb_ready),
+                 
                  .addr(tb_addr),
                  .w(tb_w)
                 );
@@ -119,10 +120,6 @@ module tb_sha1_w_mem();
         begin
           $display("addr:      0x%02x:", dut.addr);
           $display("addr4:     0x%02x:", dut.addr[3 : 0]);
-          $display("s13_addr:  0x%02x:", dut.external_addr_mux.s13_addr);
-          $display("s8_addr:   0x%02x:", dut.external_addr_mux.s8_addr);
-          $display("s2_addr:   0x%02x:", dut.external_addr_mux.s2_addr);
-          $display("pre_w  :   0x%08x:", dut.external_addr_mux.pre_w);
           $display("w_mem_new: 0x%08x:", dut.w_mem_new);
           $display("w_mem_we:  0x%x:", dut.w_mem_we);
         end
@@ -149,6 +146,55 @@ module tb_sha1_w_mem();
 
       $display("w12_reg = %08x, w13_reg = %08x, w14_reg = %08x, w15_reg = %08x", 
                dut.w_mem[12], dut.w_mem[13], dut.w_mem[14], dut.w_mem[15]);
+
+      $display("w16_reg = %08x, w17_reg = %08x, w18_reg = %08x, w19_reg = %08x", 
+               dut.w_mem[16], dut.w_mem[17], dut.w_mem[18], dut.w_mem[19]);
+
+      $display("w20_reg = %08x, w21_reg = %08x, w22_reg = %08x, w23_reg = %08x", 
+               dut.w_mem[20], dut.w_mem[21], dut.w_mem[22], dut.w_mem[23]);
+
+      $display("w24_reg = %08x, w25_reg = %08x, w26_reg = %08x, w27_reg = %08x", 
+               dut.w_mem[24], dut.w_mem[25], dut.w_mem[26], dut.w_mem[27]);
+
+      $display("w28_reg = %08x, w29_reg = %08x, w30_reg = %08x, w31_reg = %08x", 
+               dut.w_mem[28], dut.w_mem[29], dut.w_mem[30], dut.w_mem[31]);
+
+      $display("w32_reg = %08x, w33_reg = %08x, w34_reg = %08x, w35_reg = %08x", 
+               dut.w_mem[32], dut.w_mem[33], dut.w_mem[34], dut.w_mem[35]);
+
+      $display("w36_reg = %08x, w37_reg = %08x, w38_reg = %08x, w39_reg = %08x", 
+               dut.w_mem[36], dut.w_mem[37], dut.w_mem[38], dut.w_mem[39]);
+
+      $display("w40_reg = %08x, w41_reg = %08x, w42_reg = %08x, w43_reg = %08x", 
+               dut.w_mem[40], dut.w_mem[41], dut.w_mem[42], dut.w_mem[43]);
+
+      $display("w44_reg = %08x, w45_reg = %08x, w46_reg = %08x, w47_reg = %08x", 
+               dut.w_mem[44], dut.w_mem[45], dut.w_mem[46], dut.w_mem[47]);
+
+      $display("w48_reg = %08x, w49_reg = %08x, w50_reg = %08x, w51_reg = %08x", 
+               dut.w_mem[48], dut.w_mem[49], dut.w_mem[50], dut.w_mem[51]);
+
+      $display("w52_reg = %08x, w53_reg = %08x, w54_reg = %08x, w55_reg = %08x", 
+                dut.w_mem[52], dut.w_mem[53], dut.w_mem[54], dut.w_mem[55]);
+
+      $display("w56_reg = %08x, w57_reg = %08x, w58_reg = %08x, w59_reg = %08x", 
+               dut.w_mem[56], dut.w_mem[57], dut.w_mem[58], dut.w_mem[59]);
+
+      $display("w60_reg = %08x, w61_reg = %08x, w62_reg = %08x, w63_reg = %08x", 
+               dut.w_mem[60], dut.w_mem[61], dut.w_mem[62], dut.w_mem[63]);
+
+      $display("w64_reg = %08x, w65_reg = %08x, w66_reg = %08x, w67_reg = %08x", 
+               dut.w_mem[64], dut.w_mem[65], dut.w_mem[66], dut.w_mem[67]);
+
+      $display("w68_reg = %08x, w69_reg = %08x, w70_reg = %08x, w71_reg = %08x", 
+               dut.w_mem[68], dut.w_mem[69], dut.w_mem[70], dut.w_mem[71]);
+
+      $display("w72_reg = %08x, w73_reg = %08x, w74_reg = %08x, w75_reg = %08x", 
+               dut.w_mem[72], dut.w_mem[73], dut.w_mem[74], dut.w_mem[75]);
+
+      $display("w76_reg = %08x, w77_reg = %08x, w78_reg = %08x, w79_reg = %08x", 
+               dut.w_mem[76], dut.w_mem[77], dut.w_mem[78], dut.w_mem[79]);
+
       $display("");
     end
   endtask // dump_state
@@ -182,6 +228,25 @@ module tb_sha1_w_mem();
       tb_addr = 0;
     end
   endtask // reset_dut
+  
+
+  //----------------------------------------------------------------
+  // wait_ready()
+  //
+  // Wait for the ready flag in the dut to be set.
+  //
+  // Note: It is the callers responsibility to call the function
+  // when the dut is actively processing and will in fact at some
+  // point set the flag.
+  //----------------------------------------------------------------
+  task wait_ready();
+    begin
+      while (!tb_ready)
+        begin
+          #(2 * CLK_HALF_PERIOD);
+        end
+    end
+  endtask // wait_ready
 
   
   //----------------------------------------------------------------
@@ -227,18 +292,8 @@ module tb_sha1_w_mem();
       tb_init = 1;
       #(4 * CLK_HALF_PERIOD);
       tb_init = 0;
-      dump_w_state();
 
-      #(25 * CLK_HALF_PERIOD);
-      dump_w_state();
-      
-      #(25 * CLK_HALF_PERIOD);
-      dump_w_state();
-      
-      #(25 * CLK_HALF_PERIOD);
-      dump_w_state();
-      
-      #(25 * CLK_HALF_PERIOD);
+      wait_ready();
       dump_w_state();
     end
   endtask // test_w_schedule
@@ -251,13 +306,13 @@ module tb_sha1_w_mem();
   // Note: Currently not a self checking test case.
   //----------------------------------------------------------------
   task test_read_w();
-    reg [6 : 0] i;
+    reg [7 : 0] i;
     begin
       $display("*** Test of W read operations. --");
       i = 0;
-      while (i < 64)
+      while (i < 80)
         begin
-          tb_addr = i[5 : 0];
+          tb_addr = i;
           $display("API: w%02x, internal w%02x = 0x%02x", tb_addr, dut.addr, dut.w_tmp);
           i = i + 1;
           #(2 * CLK_HALF_PERIOD);
@@ -279,7 +334,6 @@ module tb_sha1_w_mem();
       dump_mem();
       
       test_w_schedule();
-      dump_mem();
 
       test_read_w();
 
