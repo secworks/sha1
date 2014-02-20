@@ -26,6 +26,6 @@ has been synthesized using Altera Quartus-II 13.1 without errors and
 design related warnings.
 
 
-***(2014-01-29):*** Initial draft.
+***(2014-01-29):***
 
-Based on the SHA-256 core. 
+Initial draft. Based on the SHA-256 core. 
