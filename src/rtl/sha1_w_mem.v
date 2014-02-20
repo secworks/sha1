@@ -81,13 +81,9 @@ module sha1_w_mem(
   //----------------------------------------------------------------
   reg [31 : 0] w_tmp;
   reg [31 : 0] w_new;
-
-  reg [7 : 0] w_addr;
-  
-  reg w_init;
-  reg w_update;
-  
-  reg ready_tmp;
+  reg [7 : 0]  w_addr;
+  reg          w_update;
+  reg          ready_tmp;
   
   
   //----------------------------------------------------------------
@@ -237,9 +233,7 @@ module sha1_w_mem(
             
             if (init)
               begin
-                w_init    = 1;
-                w_ctr_set = 1;
-                
+                w_ctr_set           = 1;
                 sha1_w_mem_ctrl_new = CTRL_UPDATE;
                 sha1_w_mem_ctrl_we  = 1;
               end
