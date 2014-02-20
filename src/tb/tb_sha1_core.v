@@ -45,7 +45,7 @@ module tb_sha1_core();
   //----------------------------------------------------------------
   // Internal constant and parameter definitions.
   //----------------------------------------------------------------
-  parameter DEBUG = 0;
+  parameter DEBUG = 1;
 
   parameter CLK_HALF_PERIOD = 2;
   
@@ -133,31 +133,27 @@ module tb_sha1_core();
       $display("");
       
       $display("Control signals and counter:");
-      $display("sha1_ctrl_reg = 0x%02x", dut.sha1_ctrl_reg);
-      $display("digest_init     = 0x%01x, digest_update = 0x%01x", 
+      $display("sha1_ctrl_reg = 0x%01x", dut.sha1_ctrl_reg);
+      $display("digest_init   = 0x%01x, digest_update = 0x%01x", 
                dut.digest_init, dut.digest_update);
-      $display("state_init      = 0x%01x, state_update  = 0x%01x", 
+      $display("state_init    = 0x%01x, state_update  = 0x%01x", 
                dut.state_init, dut.state_update);
-      $display("first_block     = 0x%01x, ready_flag    = 0x%01x, w_init    = 0x%01x", 
+      $display("first_block   = 0x%01x, ready_flag    = 0x%01x, w_init        = 0x%01x", 
                dut.first_block, dut.ready_flag, dut.w_init);
-      $display("round_ctr_inc       = 0x%01x, round_ctr_rst     = 0x%01x, round_ctr_reg = 0x%02x", 
+      $display("round_ctr_inc = 0x%01x, round_ctr_rst = 0x%01x, round_ctr_reg = 0x%02x", 
                dut.round_ctr_inc, dut.round_ctr_rst, dut.round_ctr_reg);
       $display("");
 
       $display("State registers:");
       $display("a_reg = 0x%08x, b_reg = 0x%08x, c_reg = 0x%08x, d_reg = 0x%08x, e_reg = 0x%08x", 
                dut.a_reg, dut.b_reg, dut.c_reg, dut.d_reg,  dut.e_reg);
-      $display("");
       $display("a_new = 0x%08x, b_new = 0x%08x, c_new = 0x%08x, d_new = 0x%08x, e_new = 0x%08x", 
                dut.a_new, dut.b_new, dut.c_new, dut.d_new, dut.e_new);
       $display("");
 
       $display("State update values:");
-      $display("w = 0x%08x, k = 0x%08x, t = 0x%08x", dut.w, dut.k_data,  dut.t);
-      $display("");
-
-      $display("wmem data:");
-      $display("w_addr = 0x%02x,       w  = 0x%08x", dut.w_mem.addr, dut.w_mem.w_tmp);
+      $display("f = 0x%08x, k = 0x%08x, t = 0x%08x, w = 0x%08x,", 
+               dut.state_logic.f, dut.state_logic.k, dut.t, dut.w);
       $display("");
     end
   endtask // dump_dut_state
@@ -230,14 +226,18 @@ module tb_sha1_core();
       while (!tb_ready)
         begin
           #(2 * CLK_HALF_PERIOD);
+          
         end
     end
   endtask // wait_ready
 
   
   //----------------------------------------------------------------
+  // single_block_test
+  //
+  // Test a message of at most one block.
   //----------------------------------------------------------------
-  task single_block_test(input [7 : 0] tc_number,
+  task single_block_test(input [7 : 0]   tc_number,
                          input [511 : 0] block,
                          input [159 : 0] expected);
    begin
@@ -274,7 +274,7 @@ module tb_sha1_core();
   //
   // Test message consisting of two blocks.
   //----------------------------------------------------------------
-  task double_block_test(input [7 : 0] tc_number,
+  task double_block_test(input [7 : 0]   tc_number,
                          input [511 : 0] block1,
                          input [159 : 0] expected1,
                          input [511 : 0] block2,
