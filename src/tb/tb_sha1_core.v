@@ -140,8 +140,8 @@ module tb_sha1_core();
                dut.state_init, dut.state_update);
       $display("first_block     = 0x%01x, ready_flag    = 0x%01x, w_init    = 0x%01x", 
                dut.first_block, dut.ready_flag, dut.w_init);
-      $display("t_ctr_inc       = 0x%01x, t_ctr_rst     = 0x%01x, t_ctr_reg = 0x%02x", 
-               dut.t_ctr_inc, dut.t_ctr_rst, dut.t_ctr_reg);
+      $display("round_ctr_inc       = 0x%01x, round_ctr_rst     = 0x%01x, round_ctr_reg = 0x%02x", 
+               dut.round_ctr_inc, dut.round_ctr_rst, dut.round_ctr_reg);
       $display("");
 
       $display("State registers:");
@@ -153,11 +153,11 @@ module tb_sha1_core();
       $display("");
 
       $display("State update values:");
-      $display("w = 0x%08x, k = 0x%08x, t = 0x%08x", dut.w_data, dut.k_data,  dut.t);
+      $display("w = 0x%08x, k = 0x%08x, t = 0x%08x", dut.w, dut.k_data,  dut.t);
       $display("");
 
       $display("wmem data:");
-      $display("w_addr = 0x%02x,       w_data  = 0x%08x", dut.w_mem.addr, dut.w_mem.w_tmp);
+      $display("w_addr = 0x%02x,       w  = 0x%08x", dut.w_mem.addr, dut.w_mem.w_tmp);
       $display("");
     end
   endtask // dump_dut_state

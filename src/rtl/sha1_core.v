@@ -95,11 +95,11 @@ module sha1_core(
   reg [31 : 0] H4_new;
   reg          H_we;
   
-  reg [6 : 0] t_ctr_reg;
-  reg [6 : 0] t_ctr_new;
-  reg         t_ctr_we;
-  reg         t_ctr_inc;
-  reg         t_ctr_rst;
+  reg [6 : 0] round_ctr_reg;
+  reg [6 : 0] round_ctr_new;
+  reg         round_ctr_we;
+  reg         round_ctr_inc;
+  reg         round_ctr_rst;
 
   reg digest_valid_reg;
   reg digest_valid_new;
@@ -129,18 +129,12 @@ module sha1_core(
 
   reg           w_init;
   wire          w_ready;
-  wire [31 : 0] w_data;
+  wire [31 : 0] w;
               
   
   //----------------------------------------------------------------
   // Module instantiantions.
   //----------------------------------------------------------------
-  sha1_k_constants k_constants(
-                               .addr(t_ctr_reg),
-                               .K(k_data)
-                               );
-
-
   sha1_w_mem w_mem(
                    .clk(clk),
                    .reset_n(reset_n),
@@ -148,8 +142,8 @@ module sha1_core(
                    .init(w_init),
                    .block(block),
                    
-                   .addr(t_ctr_reg),
-                   .w(w_data)
+                   .addr(round_ctr_reg),
+                   .w(w)
                   );
 
   
@@ -184,7 +178,7 @@ module sha1_core(
           H3_reg           <= 32'h00000000;
           H4_reg           <= 32'h00000000;
           digest_valid_reg <= 0;
-          t_ctr_reg        <= 7'b0000000;
+          round_ctr_reg    <= 7'b0000000;
           sha1_ctrl_reg    <= CTRL_IDLE;
         end
       else
@@ -208,9 +202,9 @@ module sha1_core(
               H4_reg <= H4_new;
             end
           
-          if (t_ctr_we)
+          if (round_ctr_we)
             begin
-              t_ctr_reg <= t_ctr_new;
+              round_ctr_reg <= round_ctr_new;
             end
 
           if (digest_valid_we)
@@ -265,29 +259,37 @@ module sha1_core(
   //----------------------------------------------------------------
   // t_logic
   //
-  // The logic for the T function.
+  // The logic for the t value.
   //----------------------------------------------------------------
   always @*
     begin : t_logic
-      reg [31 : 0] a_rotl5;
-      reg [31 : 0] ft;
+      reg [31 : 0] a5;
+      reg [31 : 0] f;
+      reg [31 : 0] k;
 
-      a_rotl5 = {a_reg[26 : 0], a_reg[31 : 27]};
-
-      if (t_ctr_reg < 20)
+      if (round_ctr_reg <= 19)
         begin
-          ft = (b_reg || c_reg) ^ (~b_reg || d_reg);
+          k = 32'h5a827999;
+          f = (b_reg || c_reg) ^ (~b_reg || d_reg);
         end
-      else if ((t_ctr_reg > 39) && (t_ctr_reg < 60))
+      else if ((round_ctr_reg >= 20) && (round_ctr_reg <= 39))
         begin
-          ft = (b_reg || c_reg) ^ (b_reg || d_reg) ^ (c_reg || d_reg);
+          k = 32'h6ed9eba1;
+          f = b_reg ^ c_reg ^ d_reg;
         end
-      else
+      else if ((round_ctr_reg >= 40) && (round_ctr_reg <= 59))
         begin
-          ft = b_reg ^ c_reg ^ d_reg;
+          k = 32'h8f1bbcdc;
+          f = (b_reg || c_reg) ^ (b_reg || d_reg) ^ (c_reg || d_reg);
         end
-
-      t = a_rotl5 + ft + e_reg + k_data + w_data;
+      else if (round_ctr_reg >= 60)
+        begin
+          k = 32'hca62c1d6;
+          f = b_reg ^ c_reg ^ d_reg;
+        end
+      
+      a5 = {a_reg[26 : 0], a_reg[31 : 27]};
+      t = a5 + e_reg + f + k + w;
     end // t_logic
   
   
@@ -341,27 +343,28 @@ module sha1_core(
 
   
   //----------------------------------------------------------------
-  // t_ctr
+  // round_ctr
+  //
   // Update logic for the round counter, a monotonically 
   // increasing counter with reset.
   //----------------------------------------------------------------
   always @*
-    begin : t_ctr
-      t_ctr_new = 0;
-      t_ctr_we  = 0;
+    begin : round_ctr
+      round_ctr_new = 0;
+      round_ctr_we  = 0;
       
-      if (t_ctr_rst)
+      if (round_ctr_rst)
         begin
-          t_ctr_new = 0;
-          t_ctr_we  = 1;
+          round_ctr_new = 0;
+          round_ctr_we  = 1;
         end
 
-      if (t_ctr_inc)
+      if (round_ctr_inc)
         begin
-          t_ctr_new = t_ctr_reg + 1'b1;
-          t_ctr_we  = 1;
+          round_ctr_new = round_ctr_reg + 1'b1;
+          round_ctr_we  = 1;
         end
-    end // t_ctr
+    end // round_ctr
 
   
   //----------------------------------------------------------------
@@ -381,8 +384,8 @@ module sha1_core(
 
       w_init           = 0;
       
-      t_ctr_inc        = 0;
-      t_ctr_rst        = 0;
+      round_ctr_inc    = 0;
+      round_ctr_rst    = 0;
       
       digest_valid_new = 0;
       digest_valid_we  = 0;
@@ -402,7 +405,7 @@ module sha1_core(
                 w_init           = 1;
                 state_init       = 1;
                 first_block      = 1;
-                t_ctr_rst        = 1;
+                round_ctr_rst    = 1;
                 digest_valid_new = 0;
                 digest_valid_we  = 1;
                 sha1_ctrl_new  = CTRL_ROUNDS;
@@ -413,7 +416,7 @@ module sha1_core(
               begin
                 w_init           = 1;
                 state_init       = 1;
-                t_ctr_rst        = 1;
+                round_ctr_rst     = 1;
                 digest_valid_new = 0;
                 digest_valid_we  = 1;
                 sha1_ctrl_new  = CTRL_ROUNDS;
@@ -425,9 +428,9 @@ module sha1_core(
         CTRL_ROUNDS:
           begin
             state_update = 1;
-            t_ctr_inc    = 1;
+            round_ctr_inc    = 1;
 
-            if (t_ctr_reg == SHA1_ROUNDS)
+            if (round_ctr_reg == SHA1_ROUNDS)
               begin
                 sha1_ctrl_new = CTRL_DONE;
                 sha1_ctrl_we  = 1;
