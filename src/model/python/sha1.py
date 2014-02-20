@@ -128,7 +128,7 @@ class SHA1():
             self.k = 0x8f1bbcdc
             self.f = self._Maj(self.b, self.c, self.d)
 
-        else:
+        elif 60 <= round <= 79:
             self.k = 0xca62c1d6
             self.f = self._Parity(self.b, self.c, self.d)
         
