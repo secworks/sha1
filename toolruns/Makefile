@@ -12,7 +12,7 @@
 WMEM_SRC=../src/rtl/sha1_w_mem.v
 WMEM_TB_SRC=../src/tb/tb_sha1_w_mem.v
 
-CORE_SRC=../src/rtl/sha1_core.v ../src/rtl/sha1_k_constants.v ../src/rtl/sha1_w_mem.v
+CORE_SRC=../src/rtl/sha1_core.v ../src/rtl/sha1_w_mem.v
 CORE_TB_SRC=../src/tb/tb_sha1_core.v
 
 TOP_SRC=../src/rtl/sha1.v $(CORE_SRC)
