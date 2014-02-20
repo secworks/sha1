@@ -297,7 +297,7 @@ module sha1_core(
           if (round_ctr_reg <= 19)
             begin
               k = 32'h5a827999;
-              f = (b_reg || c_reg) ^ (~b_reg || d_reg);
+              f =  ((b_reg & c_reg) ^ (~b_reg & d_reg));
             end
           else if ((round_ctr_reg >= 20) && (round_ctr_reg <= 39))
             begin
@@ -307,7 +307,7 @@ module sha1_core(
           else if ((round_ctr_reg >= 40) && (round_ctr_reg <= 59))
             begin
               k = 32'h8f1bbcdc;
-              f = (b_reg || c_reg) ^ (b_reg || d_reg) ^ (c_reg || d_reg);
+              f = ((b_reg | c_reg) ^ (b_reg | d_reg) ^ (c_reg | d_reg));
             end
           else if (round_ctr_reg >= 60)
             begin
