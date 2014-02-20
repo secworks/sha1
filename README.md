@@ -18,6 +18,9 @@ The implementaion follows the specification in NIST FIPS 180-4.
 ## Status ##
 ***(2014-01-29):***
 
+Completed the Python based functional model. It might need some
+polishing, but works and can be used to drive the RTL implementation.
+
 Updated the W memory scheduler to a version without circular buffer and
 ahead-of-use processing similar to what is used in the SHA-256 core.
 
