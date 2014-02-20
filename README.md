@@ -16,6 +16,13 @@ The implementaion follows the specification in NIST FIPS 180-4.
 
 
 ## Status ##
+***(2014-02-20):***
+
+The core now generates the correct digest for single and double block
+messages. We need to fix the top level wrapper and build for FPGA before
+the core is somewhat completed.
+
+
 ***(2014-01-29):***
 
 Completed the Python based functional model. It might need some
