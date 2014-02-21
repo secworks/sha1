@@ -36,28 +36,33 @@
 //======================================================================
 
 module sha1(
-              // Clock and reset.
-              input wire           clk,
-              input wire           reset_n,
+            // Clock and reset.
+            input wire           clk,
+            input wire           reset_n,
+            
+            // Control.
+            input wire           cs,
+            input wire           write_read,
               
-              // Control.
-              input wire           cs,
-              input wire           write_read,
-              
-              // Data ports.
-              input wire  [7 : 0]  address,
-              input wire  [31 : 0] data_in,
-              output wire [31 : 0] data_out
-             );
+            // Data ports.
+            input wire  [7 : 0]  address,
+            input wire  [31 : 0] data_in,
+            output wire [31 : 0] data_out,
+            output wire          error
+           );
 
   //----------------------------------------------------------------
   // Internal constant and parameter definitions.
   //----------------------------------------------------------------
-  parameter ADDR_CTRL        = 8'h00;
+  parameter ADDR_NAME0       = 8'h00;
+  parameter ADDR_NAME1       = 8'h01;
+  parameter ADDR_VERSION     = 8'h02;
+
+  parameter ADDR_CTRL        = 8'h08;
   parameter CTRL_INIT_BIT    = 0;
   parameter CTRL_NEXT_BIT    = 1;
 
-  parameter ADDR_STATUS      = 8'h01;
+  parameter ADDR_STATUS      = 8'h09;
   parameter STATUS_READY_BIT = 0;
   parameter STATUS_VALID_BIT = 1;
                              
@@ -83,6 +88,10 @@ module sha1(
   parameter ADDR_DIGEST2   = 8'h22;
   parameter ADDR_DIGEST3   = 8'h23;
   parameter ADDR_DIGEST4   = 8'h24;
+
+  parameter CORE_NAME0     = 32'h73686132; // "sha1"
+  parameter CORE_NAME1     = 32'h20202020; // "    "
+  parameter CORE_VERSION   = 32'h302e3530; // "0.50"
 
   
   //----------------------------------------------------------------
@@ -143,6 +152,7 @@ module sha1(
   wire           core_digest_valid;
 
   reg [31 : 0]   tmp_data_out;
+  reg            tmp_error;
   
   
   //----------------------------------------------------------------
@@ -312,29 +322,31 @@ module sha1(
 
 
   //----------------------------------------------------------------
-  // Address decoder logic.
+  // api
+  //
+  // The interface command decoding logic.
   //----------------------------------------------------------------
   always @*
-    begin : addr_decoder
-      ctrl_we     = 0;
-      block0_we   = 0;
-      block1_we   = 0;
-      block2_we   = 0;
-      block3_we   = 0;
-      block4_we   = 0;
-      block5_we   = 0;
-      block6_we   = 0;
-      block7_we   = 0;
-      block8_we   = 0;
-      block9_we   = 0;
-      block10_we  = 0;
-      block11_we  = 0;
-      block12_we  = 0;
-      block13_we  = 0;
-      block14_we  = 0;
-      block15_we  = 0;
-
+    begin : api
+      ctrl_we      = 0;
+      block0_we    = 0;
+      block1_we    = 0;
+      block2_we    = 0;
+      block3_we    = 0;
+      block4_we    = 0;
+      block5_we    = 0;
+      block6_we    = 0;
+      block7_we    = 0;
+      block8_we    = 0;
+      block9_we    = 0;
+      block10_we   = 0;
+      block11_we   = 0;
+      block12_we   = 0;
+      block13_we   = 0;
+      block14_we   = 0;
+      block15_we   = 0;
       tmp_data_out = 32'h00000000;
+      tmp_error    = 0;
       
       if (cs)
         begin
@@ -429,8 +441,7 @@ module sha1(
                 
                 default:
                   begin
-                    // Empty since default assignemnts are handled
-                    // outside of the if-mux construct.
+                    tmp_error = 1;
                   end
               endcase // case (address)
             end // if (write_read)
@@ -439,6 +450,21 @@ module sha1(
             begin
               case (address)
                 // Read operations.
+                ADDR_NAME0:
+                  begin
+                    tmp_data_out = CORE_NAME0;
+                  end
+                
+                ADDR_NAME1:
+                  begin
+                    tmp_data_out = CORE_NAME1;
+                  end
+
+                ADDR_VERSION:
+                  begin
+                    tmp_data_out = CORE_VERSION;
+                  end
+
                 ADDR_CTRL:
                   begin
                     tmp_data_out = {28'h0000000, 2'b00, next_reg, init_reg};
@@ -556,8 +582,7 @@ module sha1(
                 
                 default:
                   begin
-                    // Empty since default assignemnts are handled
-                    // outside of the if-mux construct.                  
+                    tmp_error = 1;
                   end
               endcase // case (address)
             end
