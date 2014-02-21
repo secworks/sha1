@@ -168,7 +168,8 @@ module sha1(
                        block12_reg, block13_reg, block14_reg, block15_reg};
 
   assign data_out = tmp_data_out;
-
+  assign error    = tmp_error;
+  
              
   //----------------------------------------------------------------
   // core instantiation.
