@@ -8,6 +8,13 @@ The implementaion follows the specification in NIST FIPS 180-4.
 
 ## Implementation details ##
 
+### Altera Cyclone IV GX ###
+Implementation using Altera Quartus-II 13.1 with a EP4CGX22CF19C6 device
+as target.
+* 10718 LEs
+* 3575 Regs
+* 103 MHz
+
 
 ## TODO ##
 * Implement the main round functionality.
@@ -16,6 +23,14 @@ The implementaion follows the specification in NIST FIPS 180-4.
 
 
 ## Status ##
+***(2014-02-21):***
+
+Several minor updates to core RTL and TB after synthesis using Altera
+Quartus II tool. The core now builds to a complete FPGA design without
+any design warnings. And we have some performance results too. See
+above.
+
+
 ***(2014-02-20):***
 
 The core now generates the correct digest for single and double block
