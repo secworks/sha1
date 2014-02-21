@@ -17,13 +17,16 @@ as target.
 
 
 ## TODO ##
-* Implement the main round functionality.
-* Functional verification
-* HW implementation.
+* Extensive functional verification in real HW.
+* Add Wishbone interface.
+* Documentation
 
 
 ## Status ##
 ***(2014-02-21):***
+
+The core is basically done and should be ready to use. But the
+functional verification should be more thorough.
 
 Several minor updates to core RTL and TB after synthesis using Altera
 Quartus II tool. The core now builds to a complete FPGA design without
