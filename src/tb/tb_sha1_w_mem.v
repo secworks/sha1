@@ -62,11 +62,9 @@ module tb_sha1_w_mem();
   //----------------------------------------------------------------
   reg           tb_clk;
   reg           tb_reset_n;
-
   reg           tb_init;
   reg [511 : 0] tb_block;
   reg [6 : 0]   tb_addr;
-  wire          tb_ready;
   wire [31 : 0] tb_w;
 
   reg [63 : 0] cycle_ctr;
@@ -83,7 +81,6 @@ module tb_sha1_w_mem();
                  
                  .init(tb_init),
                  .block(tb_block),
-                 .ready(tb_ready),
                  
                  .addr(tb_addr),
                  .w(tb_w)
@@ -228,25 +225,6 @@ module tb_sha1_w_mem();
       tb_addr = 0;
     end
   endtask // reset_dut
-  
-
-  //----------------------------------------------------------------
-  // wait_ready()
-  //
-  // Wait for the ready flag in the dut to be set.
-  //
-  // Note: It is the callers responsibility to call the function
-  // when the dut is actively processing and will in fact at some
-  // point set the flag.
-  //----------------------------------------------------------------
-  task wait_ready();
-    begin
-      while (!tb_ready)
-        begin
-          #(2 * CLK_HALF_PERIOD);
-        end
-    end
-  endtask // wait_ready
 
   
   //----------------------------------------------------------------
@@ -293,7 +271,8 @@ module tb_sha1_w_mem();
       #(4 * CLK_HALF_PERIOD);
       tb_init = 0;
 
-      wait_ready();
+      #(200 * CLK_HALF_PERIOD);
+
       dump_w_state();
     end
   endtask // test_w_schedule
