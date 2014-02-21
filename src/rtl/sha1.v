@@ -203,7 +203,7 @@ module sha1(
           init_reg         <= 0;
           next_reg         <= 0;
           ready_reg        <= 0;
-          digest_reg       <= 256'h0000000000000000000000000000000000000000;
+          digest_reg       <= 160'h0000000000000000000000000000000000000000;
           digest_valid_reg <= 0;
           block0_reg       <= 32'h00000000;
           block1_reg       <= 32'h00000000;
