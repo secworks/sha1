@@ -89,7 +89,7 @@ module sha1(
   parameter ADDR_DIGEST3   = 8'h23;
   parameter ADDR_DIGEST4   = 8'h24;
 
-  parameter CORE_NAME0     = 32'h73686132; // "sha1"
+  parameter CORE_NAME0     = 32'h73686131; // "sha1"
   parameter CORE_NAME1     = 32'h20202020; // "    "
   parameter CORE_VERSION   = 32'h302e3530; // "0.50"
 
