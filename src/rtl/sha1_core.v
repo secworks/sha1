@@ -113,18 +113,12 @@ module sha1_core(
   //----------------------------------------------------------------
   // Wires.
   //----------------------------------------------------------------
-  reg digest_init;
-  reg digest_update;
-
-  reg state_init;
-  reg state_update;
-
-  reg first_block;
-
-  reg ready_flag;
-
-  reg [31 : 0] t;
-
+  reg           digest_init;
+  reg           digest_update;
+  reg           state_init;
+  reg           state_update;
+  reg           first_block;
+  reg           ready_flag;
   reg           w_init;
   wire          w_ready;
   wire [31 : 0] w;
@@ -262,6 +256,7 @@ module sha1_core(
       reg [31 : 0] a5;
       reg [31 : 0] f;
       reg [31 : 0] k;
+      reg [31 : 0] t;
 
       a5     = 32'h00000000;
       f      = 32'h00000000;
