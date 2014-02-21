@@ -53,8 +53,8 @@ module sha1_w_mem(
   //----------------------------------------------------------------
   parameter SHA1_ROUNDS = 79;
 
-  parameter CTRL_IDLE   = 0;
-  parameter CTRL_UPDATE = 1;
+  parameter CTRL_IDLE   = 1'b0;
+  parameter CTRL_UPDATE = 1'b1;
 
   
   //----------------------------------------------------------------
