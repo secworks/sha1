@@ -42,7 +42,6 @@ module sha1_w_mem(
 
                   input wire           init,
                   input wire [511 : 0] block,
-                  output wire          ready,
 
                   input wire [6 : 0]   addr,
                   output wire [31 : 0] w
@@ -83,14 +82,12 @@ module sha1_w_mem(
   reg [31 : 0] w_new;
   reg [6 : 0]  w_addr;
   reg          w_update;
-  reg          ready_tmp;
   
   
   //----------------------------------------------------------------
   // Concurrent connectivity for ports etc.
   //----------------------------------------------------------------
   assign w     = w_tmp;
-  assign ready = ready_tmp;
   
   
   //----------------------------------------------------------------
@@ -220,8 +217,6 @@ module sha1_w_mem(
       w_ctr_set = 0;
       w_ctr_inc = 0;
       w_update  = 0;
-
-      ready_tmp = 0;
       
       sha1_w_mem_ctrl_new = CTRL_IDLE;
       sha1_w_mem_ctrl_we  = 0;
@@ -229,8 +224,6 @@ module sha1_w_mem(
       case (sha1_w_mem_ctrl_reg)
         CTRL_IDLE:
           begin
-            ready_tmp = 1;
-            
             if (init)
               begin
                 w_ctr_set           = 1;
