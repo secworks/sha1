@@ -71,9 +71,9 @@ module sha1_w_mem(
   reg         w_ctr_inc;
   reg         w_ctr_set;
   
-  reg [1 : 0]  sha1_w_mem_ctrl_reg;
-  reg [1 : 0]  sha1_w_mem_ctrl_new;
-  reg          sha1_w_mem_ctrl_we;
+  reg         sha1_w_mem_ctrl_reg;
+  reg         sha1_w_mem_ctrl_new;
+  reg         sha1_w_mem_ctrl_we;
   
   
   //----------------------------------------------------------------
