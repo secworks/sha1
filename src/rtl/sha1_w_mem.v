@@ -41,6 +41,7 @@ module sha1_w_mem(
                   input wire           reset_n,
 
                   input wire [511 : 0] block,
+
                   input wire           init,
                   input wire           next,
 
@@ -125,21 +126,21 @@ module sha1_w_mem(
 
           if (w_update)
             begin
-              w_mem[00] <= wmem[01];
-              w_mem[01] <= wmem[02];
-              w_mem[02] <= wmem[03];
-              w_mem[03] <= wmem[04];
-              w_mem[04] <= wmem[05];
-              w_mem[05] <= wmem[06];
-              w_mem[06] <= wmem[07];
-              w_mem[07] <= wmem[08];
-              w_mem[08] <= wmem[09];
-              w_mem[09] <= wmem[10];
-              w_mem[10] <= wmem[11];
-              w_mem[11] <= wmem[12];
-              w_mem[12] <= wmem[13];
-              w_mem[13] <= wmem[14];
-              w_mem[14] <= wmem[15];
+              w_mem[00] <= w_mem[01];
+              w_mem[01] <= w_mem[02];
+              w_mem[02] <= w_mem[03];
+              w_mem[03] <= w_mem[04];
+              w_mem[04] <= w_mem[05];
+              w_mem[05] <= w_mem[06];
+              w_mem[06] <= w_mem[07];
+              w_mem[07] <= w_mem[08];
+              w_mem[08] <= w_mem[09];
+              w_mem[09] <= w_mem[10];
+              w_mem[10] <= w_mem[11];
+              w_mem[11] <= w_mem[12];
+              w_mem[12] <= w_mem[13];
+              w_mem[13] <= w_mem[14];
+              w_mem[14] <= w_mem[15];
               w_mem[15] <= w_new;
             end
           
@@ -228,10 +229,9 @@ module sha1_w_mem(
   //----------------------------------------------------------------
   always @*
     begin : sha1_w_mem_fsm
-      w_ctr_rest = 0;
-      w_ctr_inc  = 0;
-      w_update   = 0;
-      
+      w_ctr_rst           = 0;
+      w_ctr_inc           = 0;
+      w_update            = 0;
       sha1_w_mem_ctrl_new = CTRL_IDLE;
       sha1_w_mem_ctrl_we  = 0;
       
