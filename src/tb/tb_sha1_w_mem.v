@@ -113,6 +113,11 @@ module tb_sha1_w_mem();
         begin
           $display("cycle = %016x:", cycle_ctr);
         end
+
+      if (DEBUG)
+        begin
+          dump_w_state();
+        end
     end // dut_monitor
       
   
@@ -124,7 +129,14 @@ module tb_sha1_w_mem();
   task dump_w_state();
     begin
       $display("W state:");
+
       
+      $display("ctrl_reg = %01x, w_ctr_reg = %02x, w_update = %01x, init = %01x, next = %01x", 
+               dut.sha1_w_mem_ctrl_reg, dut.w_ctr_reg, dut.w_update, 
+               dut.init, dut.next);
+      
+      $display("w_tmp   = %08x, w_new   = %08x", dut.w_tmp, dut.w_new);
+ 
       $display("w0_reg  = %08x, w1_reg  = %08x, w2_reg  = %08x, w3_reg  = %08x", 
                dut.w_mem[00], dut.w_mem[01], dut.w_mem[02], dut.w_mem[03]);
 
@@ -161,12 +173,12 @@ module tb_sha1_w_mem();
   task init_sim();
     begin
       $display("*** Simulation init.");
-      tb_clk = 0;
+      tb_clk     = 0;
       tb_reset_n = 1;
-      cycle_ctr = 0;
-      
-      tb_init = 0;
-      tb_block = 512'h00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000;
+      cycle_ctr  = 0;
+      tb_init    = 0;
+      tb_next    = 0;
+      tb_block   = 512'h00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000;
     end
   endtask // reset_dut
 
@@ -215,8 +227,9 @@ module tb_sha1_w_mem();
       #(4 * CLK_HALF_PERIOD);
       tb_init = 0;
 
+      tb_next = 1;
       #(200 * CLK_HALF_PERIOD);
-
+      
       dump_w_state();
     end
   endtask // test_w_schedule

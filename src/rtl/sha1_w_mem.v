@@ -159,40 +159,26 @@ module sha1_w_mem(
 
   
   //----------------------------------------------------------------
-  // external_addr_mux
-  //
-  // Mux for the external read operation. This is where we exract
-  // the W variable.
-  //----------------------------------------------------------------
-  always @*
-    begin : external_addr_mux
-      if (w_ctr_reg < 16)
-        begin
-          w_tmp = w_mem[w_ctr_reg];
-        end
-      else
-        begin
-          w_tmp = w_new;
-        end
-    end // external_addr_mux
-  
-
-  //----------------------------------------------------------------
   // w_schedule
   //
   // W word expansion logic.
   //----------------------------------------------------------------
   always @*
     begin : w_schedule
+      reg [31 : 0] w16;
+      
       if (w_ctr_reg < 16)
         begin
           w_new    = 32'h00000000;
           w_update = 0;
+          w_tmp = w_mem[w_ctr_reg[3 : 0]];
         end
       else
         begin
-          w_tmp    = w_mem[13] ^ w_mem[8] ^ w_mem[2] ^ w_mem[0];
+          w16      = w_mem[13] ^ w_mem[8] ^ w_mem[2] ^ w_mem[0];
+          w_new    = {w16[30 : 0], w16[31]};
           w_update = 1;
+          w_tmp = w_new;
         end
     end // w_schedule
 
@@ -231,7 +217,6 @@ module sha1_w_mem(
     begin : sha1_w_mem_fsm
       w_ctr_rst           = 0;
       w_ctr_inc           = 0;
-      w_update            = 0;
       sha1_w_mem_ctrl_new = CTRL_IDLE;
       sha1_w_mem_ctrl_we  = 0;
       
