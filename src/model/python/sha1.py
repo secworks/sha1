@@ -186,8 +186,8 @@ def compare_digests(digest, expected):
 # If executed tests the ChaCha class using known test vectors.
 #-------------------------------------------------------------------
 def main():
-    print("Testing the SHA-256 Python model.")
-    print("---------------------------------")
+    print("Testing the SHA-1 Python model.")
+    print("-------------------------------")
     print
 
     my_sha1 = SHA1(verbose=1);
