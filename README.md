@@ -11,15 +11,20 @@ The implementaion follows the specification in NIST FIPS 180-4.
 ### Altera Cyclone IV GX ###
 Implementation results using Altera Quartus-II 13.1.
 
-Altera Cyclone IV GX - EP4CGX22CF19C6
-* 2813 LEs
+Altera Cyclone IV E - EP4CE6F17C6
+* 2913 LEs
 * 1527 regs
-* 109 MHz
+* 107 MHz
 
-Altera Cyclone V - 5CGXFC7C7F23C8
-* 1106 ALMs
+Altera Cyclone IV GX - EP4CGX22CF19C6
+* 2814 LEs
 * 1527 regs
 * 105 MHz
+
+Altera Cyclone V - 5CGXFC7C7F23C8
+* 1124 ALMs
+* 1527 regs
+* 104 MHz
 
 
 ## TODO ##

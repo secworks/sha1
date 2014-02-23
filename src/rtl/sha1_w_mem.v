@@ -62,6 +62,23 @@ module sha1_w_mem(
   // Registers including update variables and write enable.
   //----------------------------------------------------------------
   reg [31 : 0] w_mem [0 : 15];
+  reg [31 : 0] w_mem00_new;
+  reg [31 : 0] w_mem01_new;
+  reg [31 : 0] w_mem02_new;
+  reg [31 : 0] w_mem03_new;
+  reg [31 : 0] w_mem04_new;
+  reg [31 : 0] w_mem05_new;
+  reg [31 : 0] w_mem06_new;
+  reg [31 : 0] w_mem07_new;
+  reg [31 : 0] w_mem08_new;
+  reg [31 : 0] w_mem09_new;
+  reg [31 : 0] w_mem10_new;
+  reg [31 : 0] w_mem11_new;
+  reg [31 : 0] w_mem12_new;
+  reg [31 : 0] w_mem13_new;
+  reg [31 : 0] w_mem14_new;
+  reg [31 : 0] w_mem15_new;
+  reg          w_mem_we;
   
   reg [6 : 0] w_ctr_reg;
   reg [6 : 0] w_ctr_new;
@@ -99,65 +116,45 @@ module sha1_w_mem(
     begin : reg_update
       if (!reset_n)
         begin
-          w_mem[00] <= 32'h00000000;
-          w_mem[01] <= 32'h00000000;
-          w_mem[02] <= 32'h00000000;
-          w_mem[03] <= 32'h00000000;
-          w_mem[04] <= 32'h00000000;
-          w_mem[05] <= 32'h00000000;
-          w_mem[06] <= 32'h00000000;
-          w_mem[07] <= 32'h00000000;
-          w_mem[08] <= 32'h00000000;
-          w_mem[09] <= 32'h00000000;
-          w_mem[10] <= 32'h00000000;
-          w_mem[11] <= 32'h00000000;
-          w_mem[12] <= 32'h00000000;
-          w_mem[13] <= 32'h00000000;
-          w_mem[14] <= 32'h00000000;
-          w_mem[15] <= 32'h00000000;
-          
+          w_mem[00]           <= 32'h00000000;
+          w_mem[01]           <= 32'h00000000;
+          w_mem[02]           <= 32'h00000000;
+          w_mem[03]           <= 32'h00000000;
+          w_mem[04]           <= 32'h00000000;
+          w_mem[05]           <= 32'h00000000;
+          w_mem[06]           <= 32'h00000000;
+          w_mem[07]           <= 32'h00000000;
+          w_mem[08]           <= 32'h00000000;
+          w_mem[09]           <= 32'h00000000;
+          w_mem[10]           <= 32'h00000000;
+          w_mem[11]           <= 32'h00000000;
+          w_mem[12]           <= 32'h00000000;
+          w_mem[13]           <= 32'h00000000;
+          w_mem[14]           <= 32'h00000000;
+          w_mem[15]           <= 32'h00000000;
           w_ctr_reg           <= 7'b0000000;
           sha1_w_mem_ctrl_reg <= CTRL_IDLE;
         end
       else
         begin
-          if (init)
+          if (w_mem_we)
             begin
-              w_mem[00] <= block[511 : 480];
-              w_mem[01] <= block[479 : 448];
-              w_mem[02] <= block[447 : 416];
-              w_mem[03] <= block[415 : 384];
-              w_mem[04] <= block[383 : 352];
-              w_mem[05] <= block[351 : 320];
-              w_mem[06] <= block[319 : 288];
-              w_mem[07] <= block[287 : 256];
-              w_mem[08] <= block[255 : 224];
-              w_mem[09] <= block[223 : 192];
-              w_mem[10] <= block[191 : 160];
-              w_mem[11] <= block[159 : 128];
-              w_mem[12] <= block[127 :  96];
-              w_mem[13] <= block[95  :  64];
-              w_mem[14] <= block[63  :  32];
-              w_mem[15] <= block[31  :   0];
-            end
-          else if (mem_update)
-            begin
-              w_mem[00] <= w_mem[01];
-              w_mem[01] <= w_mem[02];
-              w_mem[02] <= w_mem[03];
-              w_mem[03] <= w_mem[04];
-              w_mem[04] <= w_mem[05];
-              w_mem[05] <= w_mem[06];
-              w_mem[06] <= w_mem[07];
-              w_mem[07] <= w_mem[08];
-              w_mem[08] <= w_mem[09];
-              w_mem[09] <= w_mem[10];
-              w_mem[10] <= w_mem[11];
-              w_mem[11] <= w_mem[12];
-              w_mem[12] <= w_mem[13];
-              w_mem[13] <= w_mem[14];
-              w_mem[14] <= w_mem[15];
-              w_mem[15] <= w_new;
+              w_mem[00] <= w_mem00_new;
+              w_mem[01] <= w_mem01_new;
+              w_mem[02] <= w_mem02_new;
+              w_mem[03] <= w_mem03_new;
+              w_mem[04] <= w_mem04_new;
+              w_mem[05] <= w_mem05_new;
+              w_mem[06] <= w_mem06_new;
+              w_mem[07] <= w_mem07_new;
+              w_mem[08] <= w_mem08_new;
+              w_mem[09] <= w_mem09_new;
+              w_mem[10] <= w_mem10_new;
+              w_mem[11] <= w_mem11_new;
+              w_mem[12] <= w_mem12_new;
+              w_mem[13] <= w_mem13_new;
+              w_mem[14] <= w_mem14_new;
+              w_mem[15] <= w_mem15_new;
             end
           
           if (w_ctr_we)
@@ -175,48 +172,105 @@ module sha1_w_mem(
 
   
   //----------------------------------------------------------------
-  // externalw_schedule
+  // select_w
   //
-  // W word expansion logic. Also controls what is returned as
-  // the word w for a given round.
+  // W word selection logic. Returns either directly from the 
+  // memory or the next w value calculated.
   //----------------------------------------------------------------
   always @*
     begin : w_schedule
       if (w_ctr_reg < 16)
         begin
-          w_tmp      = w_mem[w_ctr_reg[3 : 0]];
-          mem_update = 0;
+          w_tmp = w_mem[w_ctr_reg[3 : 0]];
         end
       else
         begin
-          w_tmp      = w_new;
-          mem_update = 1;
+          w_tmp = w_new;
         end
     end // w_schedule
 
   
   //----------------------------------------------------------------
-  // w_new_logic
+  // w_mem_update_logic
   //
-  // Logic that calculates the next value to be inserted into
-  // the sliding window of the memory.
+  // Update logic for the W memory. This is where the scheduling
+  // based on a sliding window is implemented.
   //----------------------------------------------------------------
   always @*
-    begin : w_new_logic
+    begin : w_mem_update_logic
       reg [31 : 0] w_0;
       reg [31 : 0] w_2;
       reg [31 : 0] w_8;
       reg [31 : 0] w_13;
       reg [31 : 0] w_16;
 
-
+      w_mem00_new = 32'h00000000;
+      w_mem01_new = 32'h00000000;
+      w_mem02_new = 32'h00000000;
+      w_mem03_new = 32'h00000000;
+      w_mem04_new = 32'h00000000;
+      w_mem05_new = 32'h00000000;
+      w_mem06_new = 32'h00000000;
+      w_mem07_new = 32'h00000000;
+      w_mem08_new = 32'h00000000;
+      w_mem09_new = 32'h00000000;
+      w_mem10_new = 32'h00000000;
+      w_mem11_new = 32'h00000000;
+      w_mem12_new = 32'h00000000;
+      w_mem13_new = 32'h00000000;
+      w_mem14_new = 32'h00000000;
+      w_mem15_new = 32'h00000000;
+      w_mem_we    = 0;
+      
       w_0   = w_mem[0];
       w_2   = w_mem[2];
       w_8   = w_mem[8];
       w_13  = w_mem[13];
       w_16  = w_13 ^ w_8 ^ w_2 ^ w_0;
       w_new = {w_16[30 : 0], w_16[31]};
-    end // w_schedule
+      
+      if (init)
+        begin
+          w_mem00_new = block[511 : 480];
+          w_mem01_new = block[479 : 448];
+          w_mem02_new = block[447 : 416];
+          w_mem03_new = block[415 : 384];
+          w_mem04_new = block[383 : 352];
+          w_mem05_new = block[351 : 320];
+          w_mem06_new = block[319 : 288];
+          w_mem07_new = block[287 : 256];
+          w_mem08_new = block[255 : 224];
+          w_mem09_new = block[223 : 192];
+          w_mem10_new = block[191 : 160];
+          w_mem11_new = block[159 : 128];
+          w_mem12_new = block[127 :  96];
+          w_mem13_new = block[95  :  64];
+          w_mem14_new = block[63  :  32];
+          w_mem15_new = block[31  :   0];
+          w_mem_we    = 1;
+        end
+
+      else if (w_ctr_reg > 15)
+        begin
+          w_mem00_new = w_mem[01];
+          w_mem01_new = w_mem[02];
+          w_mem02_new = w_mem[03];
+          w_mem03_new = w_mem[04];
+          w_mem04_new = w_mem[05];
+          w_mem05_new = w_mem[06];
+          w_mem06_new = w_mem[07];
+          w_mem07_new = w_mem[08];
+          w_mem08_new = w_mem[09];
+          w_mem09_new = w_mem[10];
+          w_mem10_new = w_mem[11];
+          w_mem11_new = w_mem[12];
+          w_mem12_new = w_mem[13];
+          w_mem13_new = w_mem[14];
+          w_mem14_new = w_mem[15];
+          w_mem15_new = w_new;
+          w_mem_we    = 1;
+        end
+    end // w_mem_update_logic
 
   
   //----------------------------------------------------------------
