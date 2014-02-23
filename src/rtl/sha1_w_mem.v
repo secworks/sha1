@@ -79,13 +79,13 @@ module sha1_w_mem(
   //----------------------------------------------------------------
   reg [31 : 0] w_tmp;
   reg [31 : 0] w_new;
-  reg          w_update;
+  reg          mem_update;
   
   
   //----------------------------------------------------------------
   // Concurrent connectivity for ports etc.
   //----------------------------------------------------------------
-  assign w     = w_tmp;
+  assign w = w_tmp;
   
   
   //----------------------------------------------------------------
@@ -123,8 +123,7 @@ module sha1_w_mem(
               w_mem[14] <= block[63  :  32];
               w_mem[15] <= block[31  :   0];
             end
-
-          if (w_update)
+          else if (mem_update)
             begin
               w_mem[00] <= w_mem[01];
               w_mem[01] <= w_mem[02];
@@ -159,27 +158,47 @@ module sha1_w_mem(
 
   
   //----------------------------------------------------------------
-  // w_schedule
+  // externalw_schedule
   //
-  // W word expansion logic.
+  // W word expansion logic. Also controls what is returned as
+  // the word w for a given round.
   //----------------------------------------------------------------
   always @*
     begin : w_schedule
-      reg [31 : 0] w16;
-      
       if (w_ctr_reg < 16)
         begin
-          w_new    = 32'h00000000;
-          w_update = 0;
-          w_tmp = w_mem[w_ctr_reg[3 : 0]];
+          w_tmp      = w_mem[w_ctr_reg[3 : 0]];
+          mem_update = 0;
         end
       else
         begin
-          w16      = w_mem[13] ^ w_mem[8] ^ w_mem[2] ^ w_mem[0];
-          w_new    = {w16[30 : 0], w16[31]};
-          w_update = 1;
-          w_tmp = w_new;
+          w_tmp      = w_new;
+          mem_update = 1;
         end
+    end // w_schedule
+
+  
+  //----------------------------------------------------------------
+  // w_new_logic
+  //
+  // Logic that calculates the next value to be inserted into
+  // the sliding window of the memory.
+  //----------------------------------------------------------------
+  always @*
+    begin : w_new_logic
+      reg [31 : 0] w_0;
+      reg [31 : 0] w_2;
+      reg [31 : 0] w_8;
+      reg [31 : 0] w_13;
+      reg [31 : 0] w_16;
+
+
+      w_0   = w_mem[0];
+      w_2   = w_mem[2];
+      w_8   = w_mem[8];
+      w_13  = w_mem[13];
+      w_16  = w_13 ^ w_8 ^ w_2 ^ w_0;
+      w_new = {w_16[30 : 0], w_16[31]};
     end // w_schedule
 
   
