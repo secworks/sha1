@@ -2,8 +2,20 @@ sha1
 ====
 
 ## Introduction ##
-Verilog implementation of the SHA-1 cryptgraphic hash function.
-The implementaion follows the specification in NIST FIPS 180-4.
+Verilog implementation of the SHA-1 cryptgraphic hash function. The
+functionality follows the specification in NIST FIPS 180-4.
+
+The implementation is iterative with one cycle/round. The initialization
+takses one cycle. The W memory is based around a sliding window of 16
+32-bit registers that are updated in sync with the round processing. The
+total latency/message block is 82 cycles.
+
+There is a top level wrapper that provides a 32-bit memory like
+interface for easy integration into a System on Chip (SoC). This
+interface contains mesage block and digest registers to allow a host to
+load the next block while the current block is being processed.
+
+The implementation also includes a functional model written in Python.
 
 
 ## Implementation details ##
