@@ -40,10 +40,11 @@ module sha1_w_mem(
                   input wire           clk,
                   input wire           reset_n,
 
-                  input wire           init,
                   input wire [511 : 0] block,
 
-                  input wire [6 : 0]   addr,
+                  input wire           init,
+                  input wire           next,
+
                   output wire [31 : 0] w
                  );
 
@@ -60,15 +61,13 @@ module sha1_w_mem(
   //----------------------------------------------------------------
   // Registers including update variables and write enable.
   //----------------------------------------------------------------
-  reg [31 : 0] w_mem [0 : 79];
-  reg [31 : 0] w_mem_new;
-  reg          w_mem_we;
+  reg [31 : 0] w_mem [0 : 15];
   
   reg [6 : 0] w_ctr_reg;
   reg [6 : 0] w_ctr_new;
   reg         w_ctr_we;
   reg         w_ctr_inc;
-  reg         w_ctr_set;
+  reg         w_ctr_rst;
   
   reg         sha1_w_mem_ctrl_reg;
   reg         sha1_w_mem_ctrl_new;
@@ -80,14 +79,13 @@ module sha1_w_mem(
   //----------------------------------------------------------------
   reg [31 : 0] w_tmp;
   reg [31 : 0] w_new;
-  reg [6 : 0]  w_addr;
-  reg          w_update;
+  reg          mem_update;
   
   
   //----------------------------------------------------------------
   // Concurrent connectivity for ports etc.
   //----------------------------------------------------------------
-  assign w     = w_tmp;
+  assign w = w_tmp;
   
   
   //----------------------------------------------------------------
@@ -125,10 +123,24 @@ module sha1_w_mem(
               w_mem[14] <= block[63  :  32];
               w_mem[15] <= block[31  :   0];
             end
-
-          if (w_mem_we)
+          else if (mem_update)
             begin
-              w_mem[w_addr] <= w_mem_new;
+              w_mem[00] <= w_mem[01];
+              w_mem[01] <= w_mem[02];
+              w_mem[02] <= w_mem[03];
+              w_mem[03] <= w_mem[04];
+              w_mem[04] <= w_mem[05];
+              w_mem[05] <= w_mem[06];
+              w_mem[06] <= w_mem[07];
+              w_mem[07] <= w_mem[08];
+              w_mem[08] <= w_mem[09];
+              w_mem[09] <= w_mem[10];
+              w_mem[10] <= w_mem[11];
+              w_mem[11] <= w_mem[12];
+              w_mem[12] <= w_mem[13];
+              w_mem[13] <= w_mem[14];
+              w_mem[14] <= w_mem[15];
+              w_mem[15] <= w_new;
             end
           
           if (w_ctr_we)
@@ -146,39 +158,47 @@ module sha1_w_mem(
 
   
   //----------------------------------------------------------------
-  // external_addr_mux
+  // externalw_schedule
   //
-  // Mux for the external read operation. This is where we exract
-  // the W variable.
-  //----------------------------------------------------------------
-  always @*
-    begin : external_addr_mux
-      w_tmp = w_mem[addr];
-    end // external_addr_mux
-  
-
-  //----------------------------------------------------------------
-  // w_schedule
-  //
-  // W word expansion logic.
+  // W word expansion logic. Also controls what is returned as
+  // the word w for a given round.
   //----------------------------------------------------------------
   always @*
     begin : w_schedule
-      reg [31 : 0] w_new_tmp;
-      
-      w_mem_we  = 0;
-      w_new_tmp = 32'h00000000;
-      w_mem_new = 32'h00000000;
-      w_addr    = 0;
-
-      if (w_update)
+      if (w_ctr_reg < 16)
         begin
-          w_new_tmp = w_mem[(w_ctr_reg - 3)] ^ w_mem[(w_ctr_reg - 8)] ^
-                      w_mem[(w_ctr_reg - 14)] ^ w_mem[(w_ctr_reg - 16)];
-          w_mem_new = {w_new_tmp[30 : 0], w_new_tmp[31]};
-          w_addr    = w_ctr_reg;
-          w_mem_we  = 1;
+          w_tmp      = w_mem[w_ctr_reg[3 : 0]];
+          mem_update = 0;
         end
+      else
+        begin
+          w_tmp      = w_new;
+          mem_update = 1;
+        end
+    end // w_schedule
+
+  
+  //----------------------------------------------------------------
+  // w_new_logic
+  //
+  // Logic that calculates the next value to be inserted into
+  // the sliding window of the memory.
+  //----------------------------------------------------------------
+  always @*
+    begin : w_new_logic
+      reg [31 : 0] w_0;
+      reg [31 : 0] w_2;
+      reg [31 : 0] w_8;
+      reg [31 : 0] w_13;
+      reg [31 : 0] w_16;
+
+
+      w_0   = w_mem[0];
+      w_2   = w_mem[2];
+      w_8   = w_mem[8];
+      w_13  = w_mem[13];
+      w_16  = w_13 ^ w_8 ^ w_2 ^ w_0;
+      w_new = {w_16[30 : 0], w_16[31]};
     end // w_schedule
 
   
@@ -193,9 +213,9 @@ module sha1_w_mem(
       w_ctr_new = 0;
       w_ctr_we  = 0;
       
-      if (w_ctr_set)
+      if (w_ctr_rst)
         begin
-          w_ctr_new = 6'h10;
+          w_ctr_new = 6'h00;
           w_ctr_we  = 1;
         end
 
@@ -214,10 +234,8 @@ module sha1_w_mem(
   //----------------------------------------------------------------
   always @*
     begin : sha1_w_mem_fsm
-      w_ctr_set = 0;
-      w_ctr_inc = 0;
-      w_update  = 0;
-      
+      w_ctr_rst           = 0;
+      w_ctr_inc           = 0;
       sha1_w_mem_ctrl_new = CTRL_IDLE;
       sha1_w_mem_ctrl_we  = 0;
       
@@ -226,7 +244,7 @@ module sha1_w_mem(
           begin
             if (init)
               begin
-                w_ctr_set           = 1;
+                w_ctr_rst           = 1;
                 sha1_w_mem_ctrl_new = CTRL_UPDATE;
                 sha1_w_mem_ctrl_we  = 1;
               end
@@ -234,9 +252,11 @@ module sha1_w_mem(
         
         CTRL_UPDATE:
           begin
-            w_update  = 1;
-            w_ctr_inc = 1;
-
+            if (next)
+              begin
+                w_ctr_inc = 1;
+              end
+            
             if (w_ctr_reg == SHA1_ROUNDS)
               begin
                 sha1_w_mem_ctrl_new = CTRL_IDLE;

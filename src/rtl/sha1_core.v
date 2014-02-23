@@ -120,6 +120,7 @@ module sha1_core(
   reg           first_block;
   reg           ready_flag;
   reg           w_init;
+  reg           w_next;
   wire          w_ready;
   wire [31 : 0] w;
               
@@ -131,10 +132,11 @@ module sha1_core(
                    .clk(clk),
                    .reset_n(reset_n),
 
-                   .init(w_init),
                    .block(block),
+
+                   .init(w_init),
+                   .next(w_next),
                    
-                   .addr(round_ctr_reg),
                    .w(w)
                   );
 
@@ -365,6 +367,7 @@ module sha1_core(
       first_block      = 0;
       ready_flag       = 0;
       w_init           = 0;
+      w_next           = 0;
       round_ctr_inc    = 0;
       round_ctr_rst    = 0;
       digest_valid_new = 0;
@@ -407,7 +410,8 @@ module sha1_core(
           begin
             state_update  = 1;
             round_ctr_inc = 1;
-
+            w_next        = 1;
+            
             if (round_ctr_reg == SHA1_ROUNDS)
               begin
                 sha1_ctrl_new = CTRL_DONE;

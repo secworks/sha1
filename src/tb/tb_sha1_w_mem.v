@@ -63,8 +63,8 @@ module tb_sha1_w_mem();
   reg           tb_clk;
   reg           tb_reset_n;
   reg           tb_init;
+  reg           tb_next;
   reg [511 : 0] tb_block;
-  reg [6 : 0]   tb_addr;
   wire [31 : 0] tb_w;
 
   reg [63 : 0] cycle_ctr;
@@ -79,10 +79,11 @@ module tb_sha1_w_mem();
                  .clk(tb_clk),
                  .reset_n(tb_reset_n),
                  
-                 .init(tb_init),
                  .block(tb_block),
+
+                 .init(tb_init),
+                 .next(tb_next),
                  
-                 .addr(tb_addr),
                  .w(tb_w)
                 );
   
@@ -112,13 +113,10 @@ module tb_sha1_w_mem();
         begin
           $display("cycle = %016x:", cycle_ctr);
         end
-      
+
       if (DEBUG)
         begin
-          $display("addr:      0x%02x:", dut.addr);
-          $display("addr4:     0x%02x:", dut.addr[3 : 0]);
-          $display("w_mem_new: 0x%08x:", dut.w_mem_new);
-          $display("w_mem_we:  0x%x:", dut.w_mem_we);
+          dump_w_state();
         end
     end // dut_monitor
       
@@ -131,7 +129,14 @@ module tb_sha1_w_mem();
   task dump_w_state();
     begin
       $display("W state:");
+
       
+      $display("ctrl_reg = %01x, w_ctr_reg = %02x, mem_update = %01x, init = %01x, next = %01x", 
+               dut.sha1_w_mem_ctrl_reg, dut.w_ctr_reg, dut.mem_update, 
+               dut.init, dut.next);
+      
+      $display("w_tmp   = %08x, w_new   = %08x", dut.w_tmp, dut.w_new);
+ 
       $display("w0_reg  = %08x, w1_reg  = %08x, w2_reg  = %08x, w3_reg  = %08x", 
                dut.w_mem[00], dut.w_mem[01], dut.w_mem[02], dut.w_mem[03]);
 
@@ -143,54 +148,6 @@ module tb_sha1_w_mem();
 
       $display("w12_reg = %08x, w13_reg = %08x, w14_reg = %08x, w15_reg = %08x", 
                dut.w_mem[12], dut.w_mem[13], dut.w_mem[14], dut.w_mem[15]);
-
-      $display("w16_reg = %08x, w17_reg = %08x, w18_reg = %08x, w19_reg = %08x", 
-               dut.w_mem[16], dut.w_mem[17], dut.w_mem[18], dut.w_mem[19]);
-
-      $display("w20_reg = %08x, w21_reg = %08x, w22_reg = %08x, w23_reg = %08x", 
-               dut.w_mem[20], dut.w_mem[21], dut.w_mem[22], dut.w_mem[23]);
-
-      $display("w24_reg = %08x, w25_reg = %08x, w26_reg = %08x, w27_reg = %08x", 
-               dut.w_mem[24], dut.w_mem[25], dut.w_mem[26], dut.w_mem[27]);
-
-      $display("w28_reg = %08x, w29_reg = %08x, w30_reg = %08x, w31_reg = %08x", 
-               dut.w_mem[28], dut.w_mem[29], dut.w_mem[30], dut.w_mem[31]);
-
-      $display("w32_reg = %08x, w33_reg = %08x, w34_reg = %08x, w35_reg = %08x", 
-               dut.w_mem[32], dut.w_mem[33], dut.w_mem[34], dut.w_mem[35]);
-
-      $display("w36_reg = %08x, w37_reg = %08x, w38_reg = %08x, w39_reg = %08x", 
-               dut.w_mem[36], dut.w_mem[37], dut.w_mem[38], dut.w_mem[39]);
-
-      $display("w40_reg = %08x, w41_reg = %08x, w42_reg = %08x, w43_reg = %08x", 
-               dut.w_mem[40], dut.w_mem[41], dut.w_mem[42], dut.w_mem[43]);
-
-      $display("w44_reg = %08x, w45_reg = %08x, w46_reg = %08x, w47_reg = %08x", 
-               dut.w_mem[44], dut.w_mem[45], dut.w_mem[46], dut.w_mem[47]);
-
-      $display("w48_reg = %08x, w49_reg = %08x, w50_reg = %08x, w51_reg = %08x", 
-               dut.w_mem[48], dut.w_mem[49], dut.w_mem[50], dut.w_mem[51]);
-
-      $display("w52_reg = %08x, w53_reg = %08x, w54_reg = %08x, w55_reg = %08x", 
-                dut.w_mem[52], dut.w_mem[53], dut.w_mem[54], dut.w_mem[55]);
-
-      $display("w56_reg = %08x, w57_reg = %08x, w58_reg = %08x, w59_reg = %08x", 
-               dut.w_mem[56], dut.w_mem[57], dut.w_mem[58], dut.w_mem[59]);
-
-      $display("w60_reg = %08x, w61_reg = %08x, w62_reg = %08x, w63_reg = %08x", 
-               dut.w_mem[60], dut.w_mem[61], dut.w_mem[62], dut.w_mem[63]);
-
-      $display("w64_reg = %08x, w65_reg = %08x, w66_reg = %08x, w67_reg = %08x", 
-               dut.w_mem[64], dut.w_mem[65], dut.w_mem[66], dut.w_mem[67]);
-
-      $display("w68_reg = %08x, w69_reg = %08x, w70_reg = %08x, w71_reg = %08x", 
-               dut.w_mem[68], dut.w_mem[69], dut.w_mem[70], dut.w_mem[71]);
-
-      $display("w72_reg = %08x, w73_reg = %08x, w74_reg = %08x, w75_reg = %08x", 
-               dut.w_mem[72], dut.w_mem[73], dut.w_mem[74], dut.w_mem[75]);
-
-      $display("w76_reg = %08x, w77_reg = %08x, w78_reg = %08x, w79_reg = %08x", 
-               dut.w_mem[76], dut.w_mem[77], dut.w_mem[78], dut.w_mem[79]);
 
       $display("");
     end
@@ -216,13 +173,12 @@ module tb_sha1_w_mem();
   task init_sim();
     begin
       $display("*** Simulation init.");
-      tb_clk = 0;
+      tb_clk     = 0;
       tb_reset_n = 1;
-      cycle_ctr = 0;
-      
-      tb_init = 0;
-      tb_block = 512'h00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000;
-      tb_addr = 0;
+      cycle_ctr  = 0;
+      tb_init    = 0;
+      tb_next    = 0;
+      tb_block   = 512'h00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000;
     end
   endtask // reset_dut
 
@@ -271,8 +227,9 @@ module tb_sha1_w_mem();
       #(4 * CLK_HALF_PERIOD);
       tb_init = 0;
 
+      tb_next = 1;
       #(200 * CLK_HALF_PERIOD);
-
+      
       dump_w_state();
     end
   endtask // test_w_schedule
@@ -289,10 +246,14 @@ module tb_sha1_w_mem();
     begin
       $display("*** Test of W read operations. --");
       i = 0;
+      tb_init = 1;
+      #(2 * CLK_HALF_PERIOD);
+      tb_init = 0;
+      
       while (i < 80)
         begin
-          tb_addr = i;
-          $display("API: w%02x, internal w%02x = 0x%02x", tb_addr, dut.addr, dut.w_tmp);
+          tb_next = i;
+          $display("API: w%02x = 0x%02x", i, dut.w_tmp);
           i = i + 1;
           #(2 * CLK_HALF_PERIOD);
         end

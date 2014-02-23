@@ -9,11 +9,17 @@ The implementaion follows the specification in NIST FIPS 180-4.
 ## Implementation details ##
 
 ### Altera Cyclone IV GX ###
-Implementation using Altera Quartus-II 13.1 with a EP4CGX22CF19C6 device
-as target.
-* 10718 LEs
-* 3575 Regs
-* 103 MHz
+Implementation results using Altera Quartus-II 13.1.
+
+Altera Cyclone IV GX - EP4CGX22CF19C6
+* 2829 LEs
+* 1527 regs
+* 105 MHz
+
+Altera Cyclone V - 5CGXFC7C7F23C8
+* 1127 ALMs
+* 1527 regs
+* 105 MHz
 
 
 ## TODO ##
@@ -23,6 +29,22 @@ as target.
 
 
 ## Status ##
+**(2014-02-23):***
+
+Changed the W-memory into a sliding window with 16 32-bit registers. A
+massive improvement in resource utilization. The old results:
+
+* 10718 LEs
+* 3575 Regs
+* 103 MHz
+
+The new results:
+
+* 2829 LEs
+* 1527 regs
+* 105 MHz
+
+
 ***(2014-02-21):***
 
 The core is basically done and should be ready to use. But the
