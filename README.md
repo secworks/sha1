@@ -12,7 +12,7 @@ The implementaion follows the specification in NIST FIPS 180-4.
 Implementation results using Altera Quartus-II 13.1.
 
 Altera Cyclone IV GX - EP4CGX22CF19C6
-* 2829 LEs
+* 2813 LEs
 * 1527 regs
 * 105 MHz
 
@@ -29,6 +29,11 @@ Altera Cyclone V - 5CGXFC7C7F23C8
 
 
 ## Status ##
+**(2014-02-23):***
+
+Added reset of W-memory registers. This reduce the size of the
+implementation with 16 LEs - one for each register.
+
 **(2014-02-23):***
 
 Changed the W-memory into a sliding window with 16 32-bit registers. A
