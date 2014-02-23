@@ -14,10 +14,10 @@ Implementation results using Altera Quartus-II 13.1.
 Altera Cyclone IV GX - EP4CGX22CF19C6
 * 2813 LEs
 * 1527 regs
-* 105 MHz
+* 109 MHz
 
 Altera Cyclone V - 5CGXFC7C7F23C8
-* 1127 ALMs
+* 1106 ALMs
 * 1527 regs
 * 105 MHz
 
