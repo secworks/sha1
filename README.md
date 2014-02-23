@@ -37,12 +37,12 @@ Implementation results using Altera Quartus-II 13.1.
 
 
 ## Status ##
-**(2014-02-23):***
+***(2014-02-23):***
 
 Added reset of W-memory registers. This reduce the size of the
 implementation with 16 LEs - one for each register.
 
-**(2014-02-23):***
+***(2014-02-23):***
 
 Changed the W-memory into a sliding window with 16 32-bit registers. A
 massive improvement in resource utilization. The old results:
