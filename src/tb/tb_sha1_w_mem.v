@@ -67,9 +67,9 @@ module tb_sha1_w_mem();
   reg [511 : 0] tb_block;
   wire [31 : 0] tb_w;
 
-  reg [63 : 0] cycle_ctr;
-  reg [31 : 0] error_ctr;
-  reg [31 : 0] tc_ctr;
+  reg [63 : 0]  cycle_ctr;
+  reg [31 : 0]  error_ctr;
+  reg [31 : 0]  tc_ctr;
   
   
   //----------------------------------------------------------------
@@ -131,9 +131,8 @@ module tb_sha1_w_mem();
       $display("W state:");
 
       
-      $display("ctrl_reg = %01x, w_ctr_reg = %02x, mem_update = %01x, init = %01x, next = %01x", 
-               dut.sha1_w_mem_ctrl_reg, dut.w_ctr_reg, dut.mem_update, 
-               dut.init, dut.next);
+      $display("ctrl_reg = %01x, w_ctr_reg = %02x, init = %01x, next = %01x", 
+               dut.sha1_w_mem_ctrl_reg, dut.w_ctr_reg, dut.init, dut.next);
       
       $display("w_tmp   = %08x, w_new   = %08x", dut.w_tmp, dut.w_new);
  

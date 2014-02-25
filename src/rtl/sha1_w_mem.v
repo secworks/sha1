@@ -96,7 +96,6 @@ module sha1_w_mem(
   //----------------------------------------------------------------
   reg [31 : 0] w_tmp;
   reg [31 : 0] w_new;
-  reg          mem_update;
   
   
   //----------------------------------------------------------------
@@ -178,7 +177,7 @@ module sha1_w_mem(
   // memory or the next w value calculated.
   //----------------------------------------------------------------
   always @*
-    begin : w_schedule
+    begin : select_w
       if (w_ctr_reg < 16)
         begin
           w_tmp = w_mem[w_ctr_reg[3 : 0]];
@@ -187,7 +186,7 @@ module sha1_w_mem(
         begin
           w_tmp = w_new;
         end
-    end // w_schedule
+    end // select_w
 
   
   //----------------------------------------------------------------
