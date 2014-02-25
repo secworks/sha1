@@ -10,10 +10,10 @@ takes one cycle. The W memory is based around a sliding window of 16
 32-bit registers that are updated in sync with the round processing. The
 total latency/message block is 82 cycles.
 
-There is a top level wrapper that provides a 32-bit memory like
-interface for easy integration into a System on Chip (SoC). This
-interface contains mesage block and digest registers to allow a host to
-load the next block while the current block is being processed.
+There are top level wrappers that provides interface for easy
+integration into a System on Chip (SoC). This interface contains mesage
+block and digest registers to allow a host to load the next block while
+the current block is being processed.
 
 The implementation also includes a functional model written in Python.
 
@@ -83,7 +83,7 @@ Implementation results using Altera Quartus-II 13.1.
 ## Status ##
 ***(2013-02-25)***
 
-Upated README with some more information about the design.
+Updated README with some more information about the design.
 
 ***(2014-02-23):***
 
