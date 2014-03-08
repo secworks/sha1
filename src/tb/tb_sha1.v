@@ -116,7 +116,7 @@ module tb_sha1();
              .cs(tb_cs),
              .we(tb_write_read),
              
-             .addr(tb_address),
+             .address(tb_address),
              .write_data(tb_data_in),
              .read_data(tb_data_out)
             );

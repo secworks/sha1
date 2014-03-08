@@ -45,7 +45,7 @@ module sha1(
             input wire           we,
               
             // Data ports.
-            input wire  [7 : 0]  addr,
+            input wire  [7 : 0]  address,
             input wire  [31 : 0] write_data,
             output wire [31 : 0] read_data,
             output wire          error
@@ -353,7 +353,7 @@ module sha1(
         begin
           if (we)
             begin
-              case (addr)
+              case (address)
                 // Write operations.
                 ADDR_CTRL:
                   begin
@@ -449,7 +449,7 @@ module sha1(
 
           else
             begin
-              case (addr)
+              case (address)
                 // Read operations.
                 ADDR_NAME0:
                   begin
