@@ -114,11 +114,11 @@ module tb_sha1();
              .reset_n(tb_reset_n),
              
              .cs(tb_cs),
-             .write_read(tb_write_read),
+             .we(tb_write_read),
              
-             .address(tb_address),
-             .data_in(tb_data_in),
-             .data_out(tb_data_out)
+             .addr(tb_address),
+             .write_data(tb_data_in),
+             .read_data(tb_data_out)
             );
   
 

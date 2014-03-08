@@ -42,12 +42,12 @@ module sha1(
             
             // Control.
             input wire           cs,
-            input wire           write_read,
+            input wire           we,
               
             // Data ports.
-            input wire  [7 : 0]  address,
-            input wire  [31 : 0] data_in,
-            output wire [31 : 0] data_out,
+            input wire  [7 : 0]  addr,
+            input wire  [31 : 0] write_data,
+            output wire [31 : 0] read_data,
             output wire          error
            );
 
@@ -151,7 +151,7 @@ module sha1(
   wire [159 : 0] core_digest;
   wire           core_digest_valid;
 
-  reg [31 : 0]   tmp_data_out;
+  reg [31 : 0]   tmp_read_data;
   reg            tmp_error;
   
   
@@ -167,7 +167,7 @@ module sha1(
                        block8_reg, block9_reg, block10_reg, block11_reg,
                        block12_reg, block13_reg, block14_reg, block15_reg};
 
-  assign data_out = tmp_data_out;
+  assign read_data = tmp_read_data;
   assign error    = tmp_error;
   
              
@@ -229,8 +229,8 @@ module sha1(
 
           if (ctrl_we)
             begin
-              init_reg <= data_in[CTRL_INIT_BIT];
-              next_reg <= data_in[CTRL_NEXT_BIT];
+              init_reg <= write_data[CTRL_INIT_BIT];
+              next_reg <= write_data[CTRL_NEXT_BIT];
             end
           
           if (core_digest_valid)
@@ -240,82 +240,82 @@ module sha1(
 
           if (block0_we)
             begin
-              block0_reg <= data_in;
+              block0_reg <= write_data;
             end
 
           if (block1_we)
             begin
-              block1_reg <= data_in;
+              block1_reg <= write_data;
             end
 
           if (block2_we)
             begin
-              block2_reg <= data_in;
+              block2_reg <= write_data;
             end
 
           if (block3_we)
             begin
-              block3_reg <= data_in;
+              block3_reg <= write_data;
             end
 
           if (block4_we)
             begin
-              block4_reg <= data_in;
+              block4_reg <= write_data;
             end
 
           if (block5_we)
             begin
-              block5_reg <= data_in;
+              block5_reg <= write_data;
             end
 
           if (block6_we)
             begin
-              block6_reg <= data_in;
+              block6_reg <= write_data;
             end
 
           if (block7_we)
             begin
-              block7_reg <= data_in;
+              block7_reg <= write_data;
             end
 
           if (block8_we)
             begin
-              block8_reg <= data_in;
+              block8_reg <= write_data;
             end
 
           if (block9_we)
             begin
-              block9_reg <= data_in;
+              block9_reg <= write_data;
             end
 
           if (block10_we)
             begin
-              block10_reg <= data_in;
+              block10_reg <= write_data;
             end
 
           if (block11_we)
             begin
-              block11_reg <= data_in;
+              block11_reg <= write_data;
             end
 
           if (block12_we)
             begin
-              block12_reg <= data_in;
+              block12_reg <= write_data;
             end
 
           if (block13_we)
             begin
-              block13_reg <= data_in;
+              block13_reg <= write_data;
             end
 
           if (block14_we)
             begin
-              block14_reg <= data_in;
+              block14_reg <= write_data;
             end
 
           if (block15_we)
             begin
-              block15_reg <= data_in;
+              block15_reg <= write_data;
             end
           
         end
@@ -329,31 +329,31 @@ module sha1(
   //----------------------------------------------------------------
   always @*
     begin : api
-      ctrl_we      = 0;
-      block0_we    = 0;
-      block1_we    = 0;
-      block2_we    = 0;
-      block3_we    = 0;
-      block4_we    = 0;
-      block5_we    = 0;
-      block6_we    = 0;
-      block7_we    = 0;
-      block8_we    = 0;
-      block9_we    = 0;
-      block10_we   = 0;
-      block11_we   = 0;
-      block12_we   = 0;
-      block13_we   = 0;
-      block14_we   = 0;
-      block15_we   = 0;
-      tmp_data_out = 32'h00000000;
-      tmp_error    = 0;
+      ctrl_we       = 0;
+      block0_we     = 0;
+      block1_we     = 0;
+      block2_we     = 0;
+      block3_we     = 0;
+      block4_we     = 0;
+      block5_we     = 0;
+      block6_we     = 0;
+      block7_we     = 0;
+      block8_we     = 0;
+      block9_we     = 0;
+      block10_we    = 0;
+      block11_we    = 0;
+      block12_we    = 0;
+      block13_we    = 0;
+      block14_we    = 0;
+      block15_we    = 0;
+      tmp_read_data = 32'h00000000;
+      tmp_error     = 0;
       
       if (cs)
         begin
-          if (write_read)
+          if (we)
             begin
-              case (address)
+              case (addr)
                 // Write operations.
                 ADDR_CTRL:
                   begin
@@ -444,148 +444,148 @@ module sha1(
                   begin
                     tmp_error = 1;
                   end
-              endcase // case (address)
+              endcase // case (addr)
             end // if (write_read)
 
           else
             begin
-              case (address)
+              case (addr)
                 // Read operations.
                 ADDR_NAME0:
                   begin
-                    tmp_data_out = CORE_NAME0;
+                    tmp_read_data = CORE_NAME0;
                   end
                 
                 ADDR_NAME1:
                   begin
-                    tmp_data_out = CORE_NAME1;
+                    tmp_read_data = CORE_NAME1;
                   end
 
                 ADDR_VERSION:
                   begin
-                    tmp_data_out = CORE_VERSION;
+                    tmp_read_data = CORE_VERSION;
                   end
 
                 ADDR_CTRL:
                   begin
-                    tmp_data_out = {28'h0000000, 2'b00, next_reg, init_reg};
+                    tmp_read_data = {28'h0000000, 2'b00, next_reg, init_reg};
                   end
                 
                 ADDR_STATUS:
                   begin
-                    tmp_data_out = {28'h0000000, 2'b00, digest_valid_reg, ready_reg};
+                    tmp_read_data = {28'h0000000, 2'b00, digest_valid_reg, ready_reg};
                   end
                 
                 ADDR_BLOCK0:
                   begin
-                    tmp_data_out = block0_reg;
+                    tmp_read_data = block0_reg;
                   end
 
                 ADDR_BLOCK1:
                   begin
-                    tmp_data_out = block1_reg;
+                    tmp_read_data = block1_reg;
                   end
 
                 ADDR_BLOCK2:
                   begin
-                    tmp_data_out = block2_reg;
+                    tmp_read_data = block2_reg;
                   end
 
                 ADDR_BLOCK3:
                   begin
-                    tmp_data_out = block3_reg;
+                    tmp_read_data = block3_reg;
                   end
 
                 ADDR_BLOCK4:
                   begin
-                    tmp_data_out = block4_reg;
+                    tmp_read_data = block4_reg;
                   end
 
                 ADDR_BLOCK5:
                   begin
-                    tmp_data_out = block5_reg;
+                    tmp_read_data = block5_reg;
                   end
 
                 ADDR_BLOCK6:
                   begin
-                    tmp_data_out = block6_reg;
+                    tmp_read_data = block6_reg;
                   end
 
                 ADDR_BLOCK7:
                   begin
-                    tmp_data_out = block7_reg;
+                    tmp_read_data = block7_reg;
                   end
 
                 ADDR_BLOCK8:
                   begin
-                    tmp_data_out = block8_reg;
+                    tmp_read_data = block8_reg;
                   end
 
                 ADDR_BLOCK9:
                   begin
-                    tmp_data_out = block9_reg;
+                    tmp_read_data = block9_reg;
                   end
 
                 ADDR_BLOCK10:
                   begin
-                    tmp_data_out = block10_reg;
+                    tmp_read_data = block10_reg;
                   end
 
                 ADDR_BLOCK11:
                   begin
-                    tmp_data_out = block11_reg;
+                    tmp_read_data = block11_reg;
                   end
 
                 ADDR_BLOCK12:
                   begin
-                    tmp_data_out = block12_reg;
+                    tmp_read_data = block12_reg;
                   end
 
                 ADDR_BLOCK13:
                   begin
-                    tmp_data_out = block13_reg;
+                    tmp_read_data = block13_reg;
                   end
 
                 ADDR_BLOCK14:
                   begin
-                    tmp_data_out = block14_reg;
+                    tmp_read_data = block14_reg;
                   end
 
                 ADDR_BLOCK15:
                   begin
-                    tmp_data_out = block15_reg;
+                    tmp_read_data = block15_reg;
                   end
 
                 ADDR_DIGEST0:
                   begin
-                    tmp_data_out = digest_reg[159 : 128];
+                    tmp_read_data = digest_reg[159 : 128];
                   end
 
                 ADDR_DIGEST1:
                   begin
-                    tmp_data_out = digest_reg[127 :  96];
+                    tmp_read_data = digest_reg[127 :  96];
                   end
 
                 ADDR_DIGEST2:
                   begin
-                    tmp_data_out = digest_reg[95  :  64];
+                    tmp_read_data = digest_reg[95  :  64];
                   end
 
                 ADDR_DIGEST3:
                   begin
-                    tmp_data_out = digest_reg[63  :  32];
+                    tmp_read_data = digest_reg[63  :  32];
                   end
 
                 ADDR_DIGEST4:
                   begin
-                    tmp_data_out = digest_reg[31  :   0];
+                    tmp_read_data = digest_reg[31  :   0];
                   end
                 
                 default:
                   begin
                     tmp_error = 1;
                   end
-              endcase // case (address)
+              endcase // case (addr)
             end
         end
     end // addr_decoder
