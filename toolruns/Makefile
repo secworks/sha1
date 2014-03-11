@@ -19,7 +19,6 @@ TOP_SRC=../src/rtl/sha1.v $(CORE_SRC)
 TOP_TB_SRC=../src/tb/tb_sha1.v
 
 SINGLE_SHOT_TOP_SRC=../src/rtl/sha1_single_shot.v $(CORE_SRC)
-SINGLE_SHOT_TOP_TB_SRC=../src/tb/tb_sha1_single_shot.v
 
 CC=iverilog
 
@@ -27,8 +26,8 @@ CC=iverilog
 all: single_shot_top top core wmem
 
 
-single_shot_top: $(TOP_TB_SRC) $(TOP_SRC) $(CORE_SRC)
-	$(CC) -o single_shot_top.sim $(TOP_TB_SRC) $(TOP_SRC)
+single_shot_top: $(TOP_TB_SRC) $(SINGLE_SHOT_TOP_SRC)
+	$(CC) -o single_shot_top.sim $(TOP_TB_SRC) $(SINGLE_SHOT_TOP_SRC)
 
 
 top: $(TOP_TB_SRC) $(TOP_SRC) $(CORE_SRC)

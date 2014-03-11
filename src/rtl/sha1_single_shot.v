@@ -3,10 +3,10 @@
 // sha1_single_shot.v
 // ------------------
 // Top level wrapper for the SHA-1 hash function providing
-// a simple memory like interface with 32 bit data access. This 
-// version of the wrapper automatically drops init and next
-// flags. This is to block the core from processing a block
-// more than one time between writes to the control register.
+// a simple memory like interface with 32 bit data access.
+//
+// This version automatically stops after processing a block. I.e. 
+// init and next automatically drops their flags.
 //
 //
 // Author: Joachim Strombergson
@@ -39,21 +39,21 @@
 //
 //======================================================================
 
-module sha1_single_shot(
-                        // Clock and reset.
-                        input wire           clk,
-                        input wire           reset_n,
-                        
-                        // Control.
-                        input wire           cs,
-                        input wire           we,
+module sha1(
+            // Clock and reset.
+            input wire           clk,
+            input wire           reset_n,
+            
+            // Control.
+            input wire           cs,
+            input wire           we,
               
-                        // Data ports.
-                        input wire  [7 : 0]  address,
-                        input wire  [31 : 0] write_data,
-                        output wire [31 : 0] read_data,
-                        output wire          error
-                       );
+            // Data ports.
+            input wire  [7 : 0]  address,
+            input wire  [31 : 0] write_data,
+            output wire [31 : 0] read_data,
+            output wire          error
+           );
 
   //----------------------------------------------------------------
   // Internal constant and parameter definitions.
@@ -104,10 +104,12 @@ module sha1_single_shot(
   reg init_reg;
   reg init_new;
   reg init_we;
-
+  reg init_set;
+    
   reg next_reg;
   reg next_new;
   reg next_we;
+  reg next_set;
   
   reg ready_reg;
 
@@ -183,19 +185,19 @@ module sha1_single_shot(
   // core instantiation.
   //----------------------------------------------------------------
   sha1_core core(
-                 .clk(clk),
-                 .reset_n(reset_n),
-                 
-                 .init(core_init),
-                 .next(core_next),
-                 
-                 .block(core_block),
-                 
-                 .ready(core_ready),
-                 
-                 .digest(core_digest),
-                 .digest_valid(core_digest_valid)
-                );
+                   .clk(clk),
+                   .reset_n(reset_n),
+                   
+                   .init(core_init),
+                   .next(core_next),
+                  
+                   .block(core_block),
+                   
+                   .ready(core_ready),
+                   
+                   .digest(core_digest),
+                   .digest_valid(core_digest_valid)
+                  );
   
   
   //----------------------------------------------------------------
@@ -333,7 +335,45 @@ module sha1_single_shot(
         end
     end // reg_update
 
+  
+  //----------------------------------------------------------------
+  // clear_flags
+  //
+  // Logic that automatically drops init and next flags.
+  //----------------------------------------------------------------
+  always @*
+    begin : clear_flags
+      init_new = 0;
+      init_we  = 0;
+      next_new = 0;
+      next_we  = 0;
+      
+      if (init_set)
+        begin
+          init_new = 1;
+          init_we  = 1;
+        end
 
+      if (init_reg && (!ready_reg))
+        begin
+          init_new = 0;
+          init_we  = 1;
+        end
+      
+      if (next_set)
+        begin
+          next_new = 1;
+          next_we  = 1;
+        end
+
+      if (next_reg && (!ready_reg))
+        begin
+          next_new = 0;
+          next_we  = 1;
+        end
+    end // clear_flags
+  
+  
   //----------------------------------------------------------------
   // api
   //
@@ -341,10 +381,8 @@ module sha1_single_shot(
   //----------------------------------------------------------------
   always @*
     begin : api
-      init_new      = 0;
-      init_we       = 0;
-      next_new      = 0;
-      next_we       = 0;
+      init_set      = 0;
+      next_set      = 0;
       block0_we     = 0;
       block1_we     = 0;
       block2_we     = 0;
@@ -363,265 +401,250 @@ module sha1_single_shot(
       block15_we    = 0;
       tmp_read_data = 32'h00000000;
       tmp_error     = 0;
-
-      if ((!ready_reg) && (init_reg))
+      
+      if (cs)
         begin
-          init_new = 0;
-          init_we  = 1;
-        end
-      else if ((!ready_reg) && (next_reg))
-        begin
-          next_new = 0;
-          next_we  = 1;
-        end
-      else
-        begin
-          if (cs)
+          if (we)
             begin
-              if (we)
-                begin
-                  case (address)
-                    // Write operations.
-                    ADDR_CTRL:
-                      begin
-                        init_new = write_data[CTRL_INIT_BIT];
-                        init_we  = 1
-                        next_new = write_data[CTRL_NEXT_BIT];
-                        next_we  = 1;
-                      end
-                    
-                    ADDR_BLOCK0:
-                      begin
-                        block0_we = 1;
-                       end
-    
-                    ADDR_BLOCK1:
-                      begin
-                        block1_we = 1;
-                      end
-    
-                    ADDR_BLOCK2:
-                      begin
-                        block2_we = 1;
-                      end
-    
-                    ADDR_BLOCK3:
-                      begin
-                        block3_we = 1;
-                      end
-    
-                    ADDR_BLOCK4:
-                      begin
-                        block4_we = 1;
-                      end
-    
-                    ADDR_BLOCK5:
-                      begin
-                        block5_we = 1;
-                      end
-    
-                    ADDR_BLOCK6:
-                      begin
-                        block6_we = 1;
-                      end
-    
-                    ADDR_BLOCK7:
-                      begin
-                        block7_we = 1;
-                      end
-    
-                    ADDR_BLOCK8:
-                      begin
-                        block8_we = 1;
-                      end
-    
-                    ADDR_BLOCK9:
-                      begin
-                        block9_we = 1;
-                      end
-    
-                    ADDR_BLOCK10:
-                      begin
-                        block10_we = 1;
-                      end
-    
-                    ADDR_BLOCK11:
-                      begin
-                        block11_we = 1;
-                      end
-    
-                    ADDR_BLOCK12:
-                      begin
-                        block12_we = 1;
-                      end
-    
-                    ADDR_BLOCK13:
-                      begin
-                        block13_we = 1;
-                      end
-    
-                    ADDR_BLOCK14:
-                      begin
-                        block14_we = 1;
-                      end
-    
-                    ADDR_BLOCK15:
-                      begin
-                        block15_we = 1;
-                      end
-                    
-                    default:
-                      begin
-                        tmp_error = 1;
-                      end
-                  endcase // case (addr)
-                end // if (write_read)
-    
-              else
-                begin
-                  case (address)
-                    // Read operations.
-                    ADDR_NAME0:
-                      begin
-                        tmp_read_data = CORE_NAME0;
-                      end
-                    
-                    ADDR_NAME1:
-                      begin
-                        tmp_read_data = CORE_NAME1;
-                      end
-    
-                    ADDR_VERSION:
-                      begin
-                        tmp_read_data = CORE_VERSION;
-                      end
-    
-                    ADDR_CTRL:
-                      begin
-                        tmp_read_data = {28'h0000000, 2'b00, next_reg, init_reg};
-                      end
-                    
-                    ADDR_STATUS:
-                      begin
-                        tmp_read_data = {28'h0000000, 2'b00, digest_valid_reg, ready_reg};
-                      end
-                    
-                    ADDR_BLOCK0:
-                      begin
-                        tmp_read_data = block0_reg;
-                      end
-    
-                    ADDR_BLOCK1:
-                      begin
-                        tmp_read_data = block1_reg;
-                      end
-    
-                    ADDR_BLOCK2:
-                      begin
-                        tmp_read_data = block2_reg;
-                      end
-    
-                    ADDR_BLOCK3:
-                      begin
-                        tmp_read_data = block3_reg;
-                      end
-    
-                    ADDR_BLOCK4:
-                      begin
-                        tmp_read_data = block4_reg;
-                      end
-    
-                    ADDR_BLOCK5:
-                      begin
-                        tmp_read_data = block5_reg;
-                      end
-    
-                    ADDR_BLOCK6:
-                      begin
-                        tmp_read_data = block6_reg;
-                      end
-    
-                    ADDR_BLOCK7:
-                      begin
-                        tmp_read_data = block7_reg;
-                      end
-    
-                    ADDR_BLOCK8:
-                      begin
-                        tmp_read_data = block8_reg;
-                      end
-    
-                    ADDR_BLOCK9:
-                      begin
-                        tmp_read_data = block9_reg;
-                      end
-    
-                    ADDR_BLOCK10:
-                      begin
-                        tmp_read_data = block10_reg;
-                      end
-    
-                    ADDR_BLOCK11:
-                      begin
-                        tmp_read_data = block11_reg;
-                      end
-    
-                    ADDR_BLOCK12:
-                      begin
-                        tmp_read_data = block12_reg;
-                      end
-    
-                    ADDR_BLOCK13:
-                      begin
-                        tmp_read_data = block13_reg;
-                      end
-    
-                    ADDR_BLOCK14:
-                      begin
-                        tmp_read_data = block14_reg;
-                      end
-    
-                    ADDR_BLOCK15:
-                      begin
-                        tmp_read_data = block15_reg;
-                      end
-    
-                    ADDR_DIGEST0:
-                      begin
-                        tmp_read_data = digest_reg[159 : 128];
-                      end
-    
-                    ADDR_DIGEST1:
-                      begin
-                        tmp_read_data = digest_reg[127 :  96];
-                      end
-    
-                    ADDR_DIGEST2:
-                      begin
-                        tmp_read_data = digest_reg[95  :  64];
-                      end
-    
-                    ADDR_DIGEST3:
-                      begin
-                        tmp_read_data = digest_reg[63  :  32];
-                      end
-    
-                    ADDR_DIGEST4:
-                      begin
-                        tmp_read_data = digest_reg[31  :   0];
-                      end
-                    
-                    default:
-                      begin
-                        tmp_error = 1;
-                      end
-                  endcase // case (addr)
-                end // else: !if(we)
-            end // if (cs)
-        end // else: !if((!ready_reg) && (next_reg))
+              case (address)
+                // Write operations.
+                ADDR_CTRL:
+                  begin
+                    init_set = write_data[CTRL_INIT_BIT];
+                    next_set = write_data[CTRL_NEXT_BIT];
+                  end
+                
+                ADDR_BLOCK0:
+                  begin
+                    block0_we = 1;
+                   end
+
+                ADDR_BLOCK1:
+                  begin
+                    block1_we = 1;
+                  end
+
+                ADDR_BLOCK2:
+                  begin
+                    block2_we = 1;
+                  end
+
+                ADDR_BLOCK3:
+                  begin
+                    block3_we = 1;
+                  end
+
+                ADDR_BLOCK4:
+                  begin
+                    block4_we = 1;
+                  end
+
+                ADDR_BLOCK5:
+                  begin
+                    block5_we = 1;
+                  end
+
+                ADDR_BLOCK6:
+                  begin
+                    block6_we = 1;
+                  end
+
+                ADDR_BLOCK7:
+                  begin
+                    block7_we = 1;
+                  end
+
+                ADDR_BLOCK8:
+                  begin
+                    block8_we = 1;
+                  end
+
+                ADDR_BLOCK9:
+                  begin
+                    block9_we = 1;
+                  end
+
+                ADDR_BLOCK10:
+                  begin
+                    block10_we = 1;
+                  end
+
+                ADDR_BLOCK11:
+                  begin
+                    block11_we = 1;
+                  end
+
+                ADDR_BLOCK12:
+                  begin
+                    block12_we = 1;
+                  end
+
+                ADDR_BLOCK13:
+                  begin
+                    block13_we = 1;
+                  end
+
+                ADDR_BLOCK14:
+                  begin
+                    block14_we = 1;
+                  end
+
+                ADDR_BLOCK15:
+                  begin
+                    block15_we = 1;
+                  end
+                
+                default:
+                  begin
+                    tmp_error = 1;
+                  end
+              endcase // case (addr)
+            end // if (write_read)
+
+          else
+            begin
+              case (address)
+                // Read operations.
+                ADDR_NAME0:
+                  begin
+                    tmp_read_data = CORE_NAME0;
+                  end
+                
+                ADDR_NAME1:
+                  begin
+                    tmp_read_data = CORE_NAME1;
+                  end
+
+                ADDR_VERSION:
+                  begin
+                    tmp_read_data = CORE_VERSION;
+                  end
+
+                ADDR_CTRL:
+                  begin
+                    tmp_read_data = {28'h0000000, 2'b00, next_reg, init_reg};
+                  end
+                
+                ADDR_STATUS:
+                  begin
+                    tmp_read_data = {28'h0000000, 2'b00, digest_valid_reg, ready_reg};
+                  end
+                
+                ADDR_BLOCK0:
+                  begin
+                    tmp_read_data = block0_reg;
+                  end
+
+                ADDR_BLOCK1:
+                  begin
+                    tmp_read_data = block1_reg;
+                  end
+
+                ADDR_BLOCK2:
+                  begin
+                    tmp_read_data = block2_reg;
+                  end
+
+                ADDR_BLOCK3:
+                  begin
+                    tmp_read_data = block3_reg;
+                  end
+
+                ADDR_BLOCK4:
+                  begin
+                    tmp_read_data = block4_reg;
+                  end
+
+                ADDR_BLOCK5:
+                  begin
+                    tmp_read_data = block5_reg;
+                  end
+
+                ADDR_BLOCK6:
+                  begin
+                    tmp_read_data = block6_reg;
+                  end
+
+                ADDR_BLOCK7:
+                  begin
+                    tmp_read_data = block7_reg;
+                  end
+
+                ADDR_BLOCK8:
+                  begin
+                    tmp_read_data = block8_reg;
+                  end
+
+                ADDR_BLOCK9:
+                  begin
+                    tmp_read_data = block9_reg;
+                  end
+
+                ADDR_BLOCK10:
+                  begin
+                    tmp_read_data = block10_reg;
+                  end
+
+                ADDR_BLOCK11:
+                  begin
+                    tmp_read_data = block11_reg;
+                  end
+
+                ADDR_BLOCK12:
+                  begin
+                    tmp_read_data = block12_reg;
+                  end
+
+                ADDR_BLOCK13:
+                  begin
+                    tmp_read_data = block13_reg;
+                  end
+
+                ADDR_BLOCK14:
+                  begin
+                    tmp_read_data = block14_reg;
+                  end
+
+                ADDR_BLOCK15:
+                  begin
+                    tmp_read_data = block15_reg;
+                  end
+
+                ADDR_DIGEST0:
+                  begin
+                    tmp_read_data = digest_reg[159 : 128];
+                  end
+
+                ADDR_DIGEST1:
+                  begin
+                    tmp_read_data = digest_reg[127 :  96];
+                  end
+
+                ADDR_DIGEST2:
+                  begin
+                    tmp_read_data = digest_reg[95  :  64];
+                  end
+
+                ADDR_DIGEST3:
+                  begin
+                    tmp_read_data = digest_reg[63  :  32];
+                  end
+
+                ADDR_DIGEST4:
+                  begin
+                    tmp_read_data = digest_reg[31  :   0];
+                  end
+                
+                default:
+                  begin
+                    tmp_error = 1;
+                  end
+              endcase // case (addr)
+            end
+        end
     end // addr_decoder
 endmodule // sha1_single_shot
 
 //======================================================================
-// EOF sha1_single_shot.v
+// EOF sha1.v
 //======================================================================
