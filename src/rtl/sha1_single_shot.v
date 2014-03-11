@@ -354,7 +354,7 @@ module sha1(
           init_we  = 1;
         end
 
-      if (init_reg && (!ready_reg))
+      if (init_reg)
         begin
           init_new = 0;
           init_we  = 1;
