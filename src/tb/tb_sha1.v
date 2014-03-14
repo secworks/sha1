@@ -328,7 +328,7 @@ module tb_sha1();
   // the word read will be available in the global variable
   // read_data.
   //----------------------------------------------------------------
-  task read_word(input [7 : 0]  address);
+  task read_word(input [7 : 0] address);
     begin
       tb_address = address;
       tb_cs = 1;
@@ -453,8 +453,9 @@ module tb_sha1();
   //
   // Perform test of a single block digest.
   //----------------------------------------------------------------
-  task single_block_test([511 : 0] block,
-                         [159 : 0] expected);
+  task single_block_test(input [511 : 0] block,
+                         input [159 : 0] expected
+                         );
     begin
       $display("*** TC%01d - Single block test started.", tc_ctr); 
      
@@ -488,10 +489,10 @@ module tb_sha1();
   // Perform test of a double block digest. Note that we check
   // the digests for both the first and final block.
   //----------------------------------------------------------------
-  task double_block_test([511 : 0] block0,
-                         [159 : 0] expected0,
-                         [511 : 0] block1,
-                         [159 : 0] expected1
+  task double_block_test(input [511 : 0] block0,
+                         input [159 : 0] expected0,
+                         input [511 : 0] block1,
+                         input [159 : 0] expected1
                         );
     begin
       $display("*** TC%01d - Double block test started.", tc_ctr); 
