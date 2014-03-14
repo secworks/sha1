@@ -45,7 +45,8 @@ module tb_sha1();
   //----------------------------------------------------------------
   // Internal constant and parameter definitions.
   //----------------------------------------------------------------
-  parameter DEBUG = 0;
+  parameter DEBUG_CORE = 1;
+  parameter DEBUG_TOP  = 1;
 
   parameter CLK_HALF_PERIOD = 2;
   
@@ -110,16 +111,17 @@ module tb_sha1();
   // Device Under Test.
   //----------------------------------------------------------------
   sha1 dut(
-             .clk(tb_clk),
-             .reset_n(tb_reset_n),
+           .clk(tb_clk),
+           .reset_n(tb_reset_n),
              
-             .cs(tb_cs),
-             .we(tb_write_read),
+           .cs(tb_cs),
+           .we(tb_write_read),
              
-             .address(tb_address),
-             .write_data(tb_data_in),
-             .read_data(tb_data_out)
-            );
+           .address(tb_address),
+           .write_data(tb_data_in),
+           .read_data(tb_data_out),
+           .error(tb_error)   
+          );
   
 
   //----------------------------------------------------------------
@@ -138,20 +140,108 @@ module tb_sha1();
   //----------------------------------------------------------------
   always
     begin : sys_monitor
+      if (DEBUG_CORE)
+        begin
+          dump_core_state();
+        end
+      
+      if (DEBUG_TOP)
+        begin
+          dump_top_state();
+        end
+
       #(2 * CLK_HALF_PERIOD);
       cycle_ctr = cycle_ctr + 1;
     end
 
   
   //----------------------------------------------------------------
-  // dump_dut_state()
+  // dump_top_state()
   //
-  // Dump the state of the dump when needed.
+  // Dump state of the the top of the dut.
   //----------------------------------------------------------------
-  task dump_dut_state();
+  task dump_top_state();
     begin
+      $display("State of top");
+      $display("-------------");
+      $display("Inputs and outputs:");
+      $display("cs      = 0x%01x,  we         = 0x%01x", dut.cs, dut.we);
+      $display("address = 0x%02x, write_data = 0x%08x", dut.address, dut.write_data);
+      $display("error   = 0x%01x,  read_data  = 0x%08x", dut.error, dut.read_data);
+      $display("");
+      
+      $display("Control and status flags:");
+      $display("init = 0x%01x, next = 0x%01x, ready = 0x%01x", 
+               dut.init_reg, dut.next_reg, dut.ready_reg);
+      $display("");
+
+      $display("block registers:");
+      $display("block0_reg  = 0x%08x, block1_reg  = 0x%08x, block2_reg  = 0x%08x, block3_reg  = 0x%08x",
+               dut.block0_reg, dut.block1_reg, dut.block2_reg, dut.block3_reg);
+
+      $display("block4_reg  = 0x%08x, block5_reg  = 0x%08x, block6_reg  = 0x%08x, block7_reg  = 0x%08x",
+               dut.block4_reg, dut.block5_reg, dut.block6_reg, dut.block7_reg);
+
+      $display("block8_reg  = 0x%08x, block9_reg  = 0x%08x, block10_reg = 0x%08x, block11_reg = 0x%08x",
+               dut.block8_reg, dut.block9_reg, dut.block10_reg, dut.block11_reg);
+
+      $display("block12_reg = 0x%08x, block13_reg = 0x%08x, block14_reg = 0x%08x, block15_reg = 0x%08x",
+               dut.block12_reg, dut.block13_reg, dut.block14_reg, dut.block15_reg);
+      $display("");
+
+      $display("Digest registers:");
+      $display("digest_reg  = 0x%040x", dut.digest_reg);
+      $display("");
     end
-  endtask // dump_dut_state
+  endtask // dump_top_state
+
+  
+  //----------------------------------------------------------------
+  // dump_core_state()
+  //
+  // Dump the state of the core inside the dut.
+  //----------------------------------------------------------------
+  task dump_core_state();
+    begin
+      $display("State of core");
+      $display("-------------");
+      $display("Inputs and outputs:");
+      $display("init   = 0x%01x, next  = 0x%01x", 
+               dut.core.init, dut.core.next);
+      $display("block  = 0x%0128x", dut.core.block);
+
+      $display("ready  = 0x%01x, valid = 0x%01x", 
+               dut.core.ready, dut.core.digest_valid);
+      $display("digest = 0x%040x", dut.core.digest);
+      $display("H0_reg = 0x%08x, H1_reg = 0x%08x, H2_reg = 0x%08x, H3_reg = 0x%08x, H4_reg = 0x%08x", 
+               dut.core.H0_reg, dut.core.H1_reg, dut.core.H2_reg, dut.core.H3_reg, dut.core.H4_reg);
+      $display("");
+      
+      $display("Control signals and counter:");
+      $display("sha1_ctrl_reg = 0x%01x", dut.core.sha1_ctrl_reg);
+      $display("digest_init   = 0x%01x, digest_update = 0x%01x", 
+               dut.core.digest_init, dut.core.digest_update);
+      $display("state_init    = 0x%01x, state_update  = 0x%01x", 
+               dut.core.state_init, dut.core.state_update);
+      $display("first_block   = 0x%01x, ready_flag    = 0x%01x, w_init        = 0x%01x", 
+               dut.core.first_block, dut.core.ready_flag, dut.core.w_init);
+      $display("round_ctr_inc = 0x%01x, round_ctr_rst = 0x%01x, round_ctr_reg = 0x%02x", 
+               dut.core.round_ctr_inc, dut.core.round_ctr_rst, dut.core.round_ctr_reg);
+      $display("");
+
+      $display("State registers:");
+      $display("a_reg = 0x%08x, b_reg = 0x%08x, c_reg = 0x%08x, d_reg = 0x%08x, e_reg = 0x%08x", 
+               dut.core.a_reg, dut.core.b_reg, dut.core.c_reg, dut.core.d_reg,  dut.core.e_reg);
+      $display("a_new = 0x%08x, b_new = 0x%08x, c_new = 0x%08x, d_new = 0x%08x, e_new = 0x%08x", 
+               dut.core.a_new, dut.core.b_new, dut.core.c_new, dut.core.d_new, dut.core.e_new);
+      $display("");
+
+      $display("State update values:");
+      $display("f = 0x%08x, k = 0x%08x, t = 0x%08x, w = 0x%08x,", 
+               dut.core.state_logic.f, dut.core.state_logic.k, dut.core.state_logic.t, dut.core.w);
+      $display("");
+    end
+  endtask // dump_core_state
   
   
   //----------------------------------------------------------------
@@ -247,7 +337,7 @@ module tb_sha1();
       read_data = tb_data_out;
       tb_cs = 0;
 
-      if (DEBUG)
+      if (DEBUG_TOP)
         begin
           $display("*** Reading 0x%08x from 0x%02x.", read_data, address);
           $display("");
@@ -264,7 +354,7 @@ module tb_sha1();
   task write_word(input [7 : 0]  address,
                   input [31 : 0] word);
     begin
-      if (DEBUG)
+      if (DEBUG_TOP)
         begin
           $display("*** Writing 0x%08x to 0x%02x.", word, address);
           $display("");

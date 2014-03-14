@@ -99,8 +99,16 @@ module sha1(
   // Registers including update variables and write enable.
   //----------------------------------------------------------------
   reg init_reg;
+  reg init_new;
+  reg init_we;
+  reg init_set;
+  reg init_rst;
+
   reg next_reg;
-  reg ctrl_we;
+  reg next_new;
+  reg next_we;
+  reg next_set;
+  reg next_rst;
   
   reg ready_reg;
 
@@ -228,10 +236,14 @@ module sha1(
           ready_reg        <= core_ready;
           digest_valid_reg <= core_digest_valid;
 
-          if (ctrl_we)
+          if (init_we)
             begin
-              init_reg <= write_data[CTRL_INIT_BIT];
-              next_reg <= write_data[CTRL_NEXT_BIT];
+              init_reg <= init_new;
+            end
+
+          if (next_we)
+            begin
+              next_reg <= next_new;
             end
           
           if (core_digest_valid)
@@ -324,13 +336,51 @@ module sha1(
 
 
   //----------------------------------------------------------------
+  // flag_reset
+  //
+  // Logic to reset init and next flags that has been set.
+  //----------------------------------------------------------------
+  always @*
+    begin : flag_reset
+      init_new = 0;
+      init_we  = 0;
+      next_new = 0;
+      next_we  = 0;
+
+      if (init_set)
+        begin
+          init_new = 1;
+          init_we  = 1;
+        end
+      else if (init_reg)
+        begin
+          init_new = 0;
+          init_we  = 1;
+        end
+
+      if (next_set)
+        begin
+          next_new = 1;
+          next_we  = 1;
+        end
+      else if (next_reg)
+        begin
+          next_new = 0;
+          next_we  = 1;
+        end
+    end
+  
+  //----------------------------------------------------------------
   // api
   //
   // The interface command decoding logic.
   //----------------------------------------------------------------
   always @*
     begin : api
-      ctrl_we       = 0;
+      init_set      = 0;
+      init_rst      = 0;
+      next_set      = 0;
+      next_rst      = 0;
       block0_we     = 0;
       block1_we     = 0;
       block2_we     = 0;
@@ -358,7 +408,23 @@ module sha1(
                 // Write operations.
                 ADDR_CTRL:
                   begin
-                    ctrl_we = 1;
+                    if (write_data[CTRL_INIT_BIT])
+                      begin
+                        init_set = 1;
+                      end
+                    else
+                      begin
+                        init_rst = 1;
+                      end
+
+                    if (write_data[CTRL_NEXT_BIT])
+                      begin
+                        next_set = 1;
+                      end
+                    else
+                      begin
+                        next_rst = 1;
+                      end
                   end
                 
                 ADDR_BLOCK0:
