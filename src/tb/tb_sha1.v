@@ -45,7 +45,8 @@ module tb_sha1();
   //----------------------------------------------------------------
   // Internal constant and parameter definitions.
   //----------------------------------------------------------------
-  parameter DEBUG = 1;
+  parameter DEBUG_CORE = 1;
+  parameter DEBUG_TOP  = 1;
 
   parameter CLK_HALF_PERIOD = 2;
   
@@ -110,16 +111,17 @@ module tb_sha1();
   // Device Under Test.
   //----------------------------------------------------------------
   sha1 dut(
-             .clk(tb_clk),
-             .reset_n(tb_reset_n),
+           .clk(tb_clk),
+           .reset_n(tb_reset_n),
              
-             .cs(tb_cs),
-             .we(tb_write_read),
+           .cs(tb_cs),
+           .we(tb_write_read),
              
-             .address(tb_address),
-             .write_data(tb_data_in),
-             .read_data(tb_data_out)
-            );
+           .address(tb_address),
+           .write_data(tb_data_in),
+           .read_data(tb_data_out),
+           .error(tb_error)   
+          );
   
 
   //----------------------------------------------------------------
@@ -138,9 +140,14 @@ module tb_sha1();
   //----------------------------------------------------------------
   always
     begin : sys_monitor
-      if (DEBUG)
+      if (DEBUG_CORE)
         begin
           dump_core_state();
+        end
+      
+      if (DEBUG_TOP)
+        begin
+          dump_top_state();
         end
 
       #(2 * CLK_HALF_PERIOD);
@@ -149,9 +156,50 @@ module tb_sha1();
 
   
   //----------------------------------------------------------------
+  // dump_top_state()
+  //
+  // Dump state of the the top of the dut.
+  //----------------------------------------------------------------
+  task dump_top_state();
+    begin
+      $display("State of top");
+      $display("-------------");
+      $display("Inputs and outputs:");
+      $display("cs      = 0x%01x,  we         = 0x%01x", dut.cs, dut.we);
+      $display("address = 0x%02x, write_data = 0x%08x", dut.address, dut.write_data);
+      $display("error   = 0x%01x,  read_data  = 0x%08x", dut.error, dut.read_data);
+      $display("");
+      
+      $display("Control and status flags:");
+      $display("init = 0x%01x, next = 0x%01x, ready = 0x%01x", 
+               dut.init_reg, dut.next_reg, dut.ready_reg);
+      $display("");
+
+      $display("block registers:");
+      $display("block0_reg  = 0x%08x, block1_reg  = 0x%08x, block2_reg  = 0x%08x, block3_reg  = 0x%08x",
+               dut.block0_reg, dut.block1_reg, dut.block2_reg, dut.block3_reg);
+
+      $display("block4_reg  = 0x%08x, block5_reg  = 0x%08x, block6_reg  = 0x%08x, block7_reg  = 0x%08x",
+               dut.block4_reg, dut.block5_reg, dut.block6_reg, dut.block7_reg);
+
+      $display("block8_reg  = 0x%08x, block9_reg  = 0x%08x, block10_reg = 0x%08x, block11_reg = 0x%08x",
+               dut.block8_reg, dut.block9_reg, dut.block10_reg, dut.block11_reg);
+
+      $display("block12_reg = 0x%08x, block13_reg = 0x%08x, block14_reg = 0x%08x, block15_reg = 0x%08x",
+               dut.block12_reg, dut.block13_reg, dut.block14_reg, dut.block15_reg);
+      $display("");
+
+      $display("Digest registers:");
+      $display("digest_reg  = 0x%040x", dut.digest_reg);
+      $display("");
+    end
+  endtask // dump_top_state
+
+  
+  //----------------------------------------------------------------
   // dump_core_state()
   //
-  // Dump the state of the core inside the dut when needed.
+  // Dump the state of the core inside the dut.
   //----------------------------------------------------------------
   task dump_core_state();
     begin
@@ -289,7 +337,7 @@ module tb_sha1();
       read_data = tb_data_out;
       tb_cs = 0;
 
-      if (DEBUG)
+      if (DEBUG_TOP)
         begin
           $display("*** Reading 0x%08x from 0x%02x.", read_data, address);
           $display("");
@@ -306,7 +354,7 @@ module tb_sha1();
   task write_word(input [7 : 0]  address,
                   input [31 : 0] word);
     begin
-      if (DEBUG)
+      if (DEBUG_TOP)
         begin
           $display("*** Writing 0x%08x to 0x%02x.", word, address);
           $display("");
