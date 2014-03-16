@@ -48,7 +48,8 @@ module tb_sha1();
   parameter DEBUG_CORE = 0;
   parameter DEBUG_TOP  = 0;
 
-  parameter CLK_HALF_PERIOD = 2;
+  parameter CLK_HALF_PERIOD = 1;
+  parameter CLK_PERIOD = CLK_HALF_PERIOD * 2;
   
   parameter ADDR_NAME0       = 8'h00;
   parameter ADDR_NAME1       = 8'h01;
@@ -150,7 +151,7 @@ module tb_sha1();
           dump_top_state();
         end
 
-      #(2 * CLK_HALF_PERIOD);
+      #(CLK_PERIOD);
       cycle_ctr = cycle_ctr + 1;
     end
 
@@ -333,7 +334,7 @@ module tb_sha1();
       tb_address = address;
       tb_cs = 1;
       tb_write_read = 0;
-      #(2 * CLK_HALF_PERIOD);
+      #(CLK_PERIOD);
       read_data = tb_data_out;
       tb_cs = 0;
 
@@ -364,7 +365,7 @@ module tb_sha1();
       tb_data_in = word;
       tb_cs = 1;
       tb_write_read = 1;
-      #(2 * CLK_HALF_PERIOD);
+      #(CLK_PERIOD);
       tb_cs = 0;
       tb_write_read = 0;
     end
@@ -461,7 +462,7 @@ module tb_sha1();
      
       write_block(block);
       write_word(ADDR_CTRL, CTRL_INIT_VALUE);
-      #(2 * CLK_HALF_PERIOD);
+      #(CLK_PERIOD);
       wait_ready();
       read_digest();
 
@@ -500,7 +501,7 @@ module tb_sha1();
       // First block
       write_block(block0);
       write_word(ADDR_CTRL, CTRL_INIT_VALUE);
-      #(2 * CLK_HALF_PERIOD);
+      #(CLK_PERIOD);
       wait_ready();
       read_digest();
 
@@ -519,7 +520,7 @@ module tb_sha1();
       // Final block
       write_block(block1);
       write_word(ADDR_CTRL, CTRL_NEXT_VALUE);
-      #(2 * CLK_HALF_PERIOD);
+      #(CLK_PERIOD);
       wait_ready();
       read_digest();
       
