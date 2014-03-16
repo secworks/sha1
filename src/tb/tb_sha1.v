@@ -45,8 +45,8 @@ module tb_sha1();
   //----------------------------------------------------------------
   // Internal constant and parameter definitions.
   //----------------------------------------------------------------
-  parameter DEBUG_CORE = 1;
-  parameter DEBUG_TOP  = 1;
+  parameter DEBUG_CORE = 0;
+  parameter DEBUG_TOP  = 0;
 
   parameter CLK_HALF_PERIOD = 2;
   
@@ -461,7 +461,7 @@ module tb_sha1();
      
       write_block(block);
       write_word(ADDR_CTRL, CTRL_INIT_VALUE);
-      write_word(ADDR_CTRL, 8'h00);
+      #(2 * CLK_HALF_PERIOD);
       wait_ready();
       read_digest();
 
@@ -500,7 +500,7 @@ module tb_sha1();
       // First block
       write_block(block0);
       write_word(ADDR_CTRL, CTRL_INIT_VALUE);
-      write_word(ADDR_CTRL, 8'h00);
+      #(2 * CLK_HALF_PERIOD);
       wait_ready();
       read_digest();
 
@@ -519,7 +519,7 @@ module tb_sha1();
       // Final block
       write_block(block1);
       write_word(ADDR_CTRL, CTRL_NEXT_VALUE);
-      write_word(ADDR_CTRL, 8'h00);
+      #(2 * CLK_HALF_PERIOD);
       wait_ready();
       read_digest();
       
