@@ -102,13 +102,11 @@ module sha1(
   reg init_new;
   reg init_we;
   reg init_set;
-  reg init_rst;
 
   reg next_reg;
   reg next_new;
   reg next_we;
   reg next_set;
-  reg next_rst;
   
   reg ready_reg;
 
@@ -177,7 +175,7 @@ module sha1(
                        block12_reg, block13_reg, block14_reg, block15_reg};
 
   assign read_data = tmp_read_data;
-  assign error    = tmp_error;
+  assign error     = tmp_error;
   
              
   //----------------------------------------------------------------
@@ -378,9 +376,7 @@ module sha1(
   always @*
     begin : api
       init_set      = 0;
-      init_rst      = 0;
       next_set      = 0;
-      next_rst      = 0;
       block0_we     = 0;
       block1_we     = 0;
       block2_we     = 0;
@@ -408,23 +404,8 @@ module sha1(
                 // Write operations.
                 ADDR_CTRL:
                   begin
-                    if (write_data[CTRL_INIT_BIT])
-                      begin
-                        init_set = 1;
-                      end
-                    else
-                      begin
-                        init_rst = 1;
-                      end
-
-                    if (write_data[CTRL_NEXT_BIT])
-                      begin
-                        next_set = 1;
-                      end
-                    else
-                      begin
-                        next_rst = 1;
-                      end
+                    init_set = write_data[CTRL_INIT_BIT];
+                    next_set = write_data[CTRL_NEXT_BIT];
                   end
                 
                 ADDR_BLOCK0:
