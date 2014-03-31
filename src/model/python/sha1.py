@@ -221,10 +221,11 @@ def main():
                    0x00000000, 0x00000000, 0x00000000, 0x00000000,
                    0x00000000, 0x00000000, 0x00000000, 0x000001C0]
 
-    TC2_1_expected = [0xa9993e36, 0x4706816a, 0xba3e2571,
-                      0x7850c26c, 0x9cd0d89d]
-    TC2_2_expected = [0xa9993e36, 0x4706816a, 0xba3e2571,
-                      0x7850c26c, 0x9cd0d89d]
+    TC2_1_expected = [0xF4286818, 0xC37B27AE, 0x0408F581,
+                      0x84677148, 0x4A566572]
+
+    TC2_2_expected = [0x84983E44, 0x1C3BD26E, 0xBAAE4AA1,
+                      0xF95129E5, 0xE54670F1]
 
     my_sha1.init()
     my_sha1.next(TC2_1_block)
@@ -237,20 +238,21 @@ def main():
 
 
     # TC3: Huge message with n blocks
-    print("TC3: Huge message block test case.")
+    n = 10000
+    print("TC3: Huge message with %d blocks test case." % n)
     TC3_block = [0xaa55aa55, 0xdeadbeef, 0x55aa55aa, 0xf00ff00f,
                  0xaa55aa55, 0xdeadbeef, 0x55aa55aa, 0xf00ff00f,
                  0xaa55aa55, 0xdeadbeef, 0x55aa55aa, 0xf00ff00f,
                  0xaa55aa55, 0xdeadbeef, 0x55aa55aa, 0xf00ff00f]
 
-    TC3_expected = [0xa9993e36, 0x4706816a, 0xba3e2571,
-                    0x7850c26c, 0x9cd0d89d]
-    n = 10000
+    TC3_expected = [0xea2ebc79, 0x35516705, 0xde1e1467,
+                    0x31e55587, 0xa0038725]
+
     my_sha1.init()
     for i in range(n):
         my_sha1.next(TC3_block)
     my_digest = my_sha1.get_digest()
-    compare_digests(my_digest, TC2_2_expected)
+    compare_digests(my_digest, TC3_expected)
     
 
 #-------------------------------------------------------------------
