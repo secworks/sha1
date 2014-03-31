@@ -200,12 +200,51 @@ def main():
     
     TC1_expected = [0xa9993e36, 0x4706816a, 0xba3e2571,
                     0x7850c26c, 0x9cd0d89d]
-    
     my_sha1.init()
     my_sha1.next(TC1_block)
     my_digest = my_sha1.get_digest()
     compare_digests(my_digest, TC1_expected)
 
+
+    # TC2: NIST testcase with message two block message.
+    TC2_1_block = [0x61626380, 0x00000000, 0x00000000, 0x00000000,
+                   0x00000000, 0x00000000, 0x00000000, 0x00000000,
+                   0x00000000, 0x00000000, 0x00000000, 0x00000000,
+                   0x00000000, 0x00000000, 0x00000000, 0x00000018]
+
+    TC2_2_block = [0x61626380, 0x00000000, 0x00000000, 0x00000000,
+                   0x00000000, 0x00000000, 0x00000000, 0x00000000,
+                   0x00000000, 0x00000000, 0x00000000, 0x00000000,
+                   0x00000000, 0x00000000, 0x00000000, 0x00000018]
+
+    TC2_1_expected = [0xa9993e36, 0x4706816a, 0xba3e2571,
+                      0x7850c26c, 0x9cd0d89d]
+    TC2_2_expected = [0xa9993e36, 0x4706816a, 0xba3e2571,
+                      0x7850c26c, 0x9cd0d89d]
+
+    my_sha1.init()
+    my_sha1.next(TC2_1_block)
+    my_digest = my_sha1.get_digest()
+    compare_digests(my_digest, TC2_1_expected)
+    my_sha1.next(TC2_2_block)
+    my_digest = my_sha1.get_digest()
+    compare_digests(my_digest, TC2_2_expected)
+
+
+    # TC3: Huge message with n blocks
+    TC3_block = [0xaa55aa55, 0xdeadbeef, 0x55aa55aa, 0xf00ff00f,
+                 0xaa55aa55, 0xdeadbeef, 0x55aa55aa, 0xf00ff00f,
+                 0xaa55aa55, 0xdeadbeef, 0x55aa55aa, 0xf00ff00f,
+                 0xaa55aa55, 0xdeadbeef, 0x55aa55aa, 0xf00ff00f]
+
+    TC3_expected = [0xa9993e36, 0x4706816a, 0xba3e2571,
+                    0x7850c26c, 0x9cd0d89d]
+    n = 10000
+    my_sha1.init()
+    for i in range(n):
+        my_sha1.next(TC3_block)
+    my_digest = my_sha1.get_digest()
+    compare_digests(my_digest, TC2_2_expected)
     
 
 #-------------------------------------------------------------------
