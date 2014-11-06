@@ -8,30 +8,30 @@
 //
 // Copyright (c) 2013 Secworks Sweden AB
 // All rights reserved.
-// 
-// Redistribution and use in source and binary forms, with or 
-// without modification, are permitted provided that the following 
-// conditions are met: 
-// 
-// 1. Redistributions of source code must retain the above copyright 
-//    notice, this list of conditions and the following disclaimer. 
-// 
-// 2. Redistributions in binary form must reproduce the above copyright 
-//    notice, this list of conditions and the following disclaimer in 
-//    the documentation and/or other materials provided with the 
-//    distribution. 
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS 
-// FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE 
-// COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, 
-// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+//
+// Redistribution and use in source and binary forms, with or
+// without modification, are permitted provided that the following
+// conditions are met:
+//
+// 1. Redistributions of source code must retain the above copyright
+//    notice, this list of conditions and the following disclaimer.
+//
+// 2. Redistributions in binary form must reproduce the above copyright
+//    notice, this list of conditions and the following disclaimer in
+//    the documentation and/or other materials provided with the
+//    distribution.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+// FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+// COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
 // BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
-// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
-// STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+// STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //======================================================================
@@ -39,19 +39,19 @@
 module sha1_core(
                  input wire            clk,
                  input wire            reset_n,
-                 
+
                  input wire            init,
                  input wire            next,
 
                  input wire [511 : 0]  block,
-                 
+
                  output wire           ready,
-                  
+
                  output wire [159 : 0] digest,
                  output wire           digest_valid
                 );
 
-  
+
   //----------------------------------------------------------------
   // Internal constant and parameter definitions.
   //----------------------------------------------------------------
@@ -62,12 +62,12 @@ module sha1_core(
   parameter H0_4 = 32'hc3d2e1f0;
 
   parameter SHA1_ROUNDS = 79;
-  
+
   parameter CTRL_IDLE   = 0;
   parameter CTRL_ROUNDS = 1;
   parameter CTRL_DONE   = 2;
-  
-  
+
+
   //----------------------------------------------------------------
   // Registers including update variables and write enable.
   //----------------------------------------------------------------
@@ -94,7 +94,7 @@ module sha1_core(
   reg [31 : 0] H4_reg;
   reg [31 : 0] H4_new;
   reg          H_we;
-  
+
   reg [6 : 0] round_ctr_reg;
   reg [6 : 0] round_ctr_new;
   reg         round_ctr_we;
@@ -104,12 +104,12 @@ module sha1_core(
   reg digest_valid_reg;
   reg digest_valid_new;
   reg digest_valid_we;
-  
+
   reg [1 : 0] sha1_ctrl_reg;
   reg [1 : 0] sha1_ctrl_new;
   reg         sha1_ctrl_we;
 
-  
+
   //----------------------------------------------------------------
   // Wires.
   //----------------------------------------------------------------
@@ -121,34 +121,33 @@ module sha1_core(
   reg           ready_flag;
   reg           w_init;
   reg           w_next;
-  wire          w_ready;
   wire [31 : 0] w;
-              
-  
+
+
   //----------------------------------------------------------------
   // Module instantiantions.
   //----------------------------------------------------------------
-  sha1_w_mem w_mem(
-                   .clk(clk),
-                   .reset_n(reset_n),
+  sha1_w_mem w_mem_inst(
+                        .clk(clk),
+                        .reset_n(reset_n),
 
-                   .block(block),
+                        .block(block),
 
-                   .init(w_init),
-                   .next(w_next),
-                   
-                   .w(w)
-                  );
+                        .init(w_init),
+                        .next(w_next),
 
-  
+                        .w(w)
+                       );
+
+
   //----------------------------------------------------------------
   // Concurrent connectivity for ports etc.
   //----------------------------------------------------------------
   assign ready        = ready_flag;
   assign digest       = {H0_reg, H1_reg, H2_reg, H3_reg, H4_reg};
   assign digest_valid = digest_valid_reg;
-  
-  
+
+
   //----------------------------------------------------------------
   // reg_update
   // Update functionality for all registers in the core.
@@ -192,7 +191,7 @@ module sha1_core(
               H3_reg <= H3_new;
               H4_reg <= H4_new;
             end
-          
+
           if (round_ctr_we)
             begin
               round_ctr_reg <= round_ctr_new;
@@ -202,7 +201,7 @@ module sha1_core(
             begin
               digest_valid_reg <= digest_valid_new;
             end
-          
+
           if (sha1_ctrl_we)
             begin
               sha1_ctrl_reg <= sha1_ctrl_new;
@@ -210,7 +209,7 @@ module sha1_core(
         end
     end // reg_update
 
-  
+
   //----------------------------------------------------------------
   // digest_logic
   //
@@ -245,8 +244,8 @@ module sha1_core(
           H_we = 1;
         end
     end // digest_logic
-  
-  
+
+
   //----------------------------------------------------------------
   // state_logic
   //
@@ -270,7 +269,7 @@ module sha1_core(
       d_new  = 32'h00000000;
       e_new  = 32'h00000000;
       a_e_we = 0;
-      
+
       if (state_init)
         begin
           if (first_block)
@@ -292,7 +291,7 @@ module sha1_core(
               a_e_we = 1;
             end
         end
-      
+
       if (state_update)
         begin
           if (round_ctr_reg <= 19)
@@ -315,7 +314,7 @@ module sha1_core(
               k = 32'hca62c1d6;
               f = b_reg ^ c_reg ^ d_reg;
             end
-      
+
           a5 = {a_reg[26 : 0], a_reg[31 : 27]};
           t = a5 + e_reg + f + k + w;
 
@@ -328,18 +327,18 @@ module sha1_core(
         end
     end // state_logic
 
-  
+
   //----------------------------------------------------------------
   // round_ctr
   //
-  // Update logic for the round counter, a monotonically 
+  // Update logic for the round counter, a monotonically
   // increasing counter with reset.
   //----------------------------------------------------------------
   always @*
     begin : round_ctr
       round_ctr_new = 0;
       round_ctr_we  = 0;
-      
+
       if (round_ctr_rst)
         begin
           round_ctr_new = 0;
@@ -353,7 +352,7 @@ module sha1_core(
         end
     end // round_ctr
 
-  
+
   //----------------------------------------------------------------
   // sha1_ctrl_fsm
   // Logic for the state machine controlling the core behaviour.
@@ -374,12 +373,12 @@ module sha1_core(
       digest_valid_we  = 0;
       sha1_ctrl_new    = CTRL_IDLE;
       sha1_ctrl_we     = 0;
-      
+
       case (sha1_ctrl_reg)
         CTRL_IDLE:
           begin
             ready_flag = 1;
-            
+
             if (init)
               begin
                 digest_init      = 1;
@@ -405,13 +404,13 @@ module sha1_core(
               end
           end
 
-        
+
         CTRL_ROUNDS:
           begin
             state_update  = 1;
             round_ctr_inc = 1;
             w_next        = 1;
-            
+
             if (round_ctr_reg == SHA1_ROUNDS)
               begin
                 sha1_ctrl_new = CTRL_DONE;
@@ -419,7 +418,7 @@ module sha1_core(
               end
           end
 
-        
+
         CTRL_DONE:
           begin
             digest_update    = 1;
@@ -430,7 +429,7 @@ module sha1_core(
           end
       endcase // case (sha1_ctrl_reg)
     end // sha1_ctrl_fsm
-    
+
 endmodule // sha1_core
 
 //======================================================================

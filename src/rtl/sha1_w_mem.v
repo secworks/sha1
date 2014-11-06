@@ -2,36 +2,36 @@
 //
 // sha1_w_mem_reg.v
 // -----------------
-// The SHA-1 W memory. This memory includes functionality to 
+// The SHA-1 W memory. This memory includes functionality to
 // expand the block into 80 words.
 //
 //
 // Copyright (c) 2013 Secworks Sweden AB
 // All rights reserved.
-// 
-// Redistribution and use in source and binary forms, with or 
-// without modification, are permitted provided that the following 
-// conditions are met: 
-// 
-// 1. Redistributions of source code must retain the above copyright 
-//    notice, this list of conditions and the following disclaimer. 
-// 
-// 2. Redistributions in binary form must reproduce the above copyright 
-//    notice, this list of conditions and the following disclaimer in 
-//    the documentation and/or other materials provided with the 
-//    distribution. 
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS 
-// FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE 
-// COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, 
-// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+//
+// Redistribution and use in source and binary forms, with or
+// without modification, are permitted provided that the following
+// conditions are met:
+//
+// 1. Redistributions of source code must retain the above copyright
+//    notice, this list of conditions and the following disclaimer.
+//
+// 2. Redistributions in binary form must reproduce the above copyright
+//    notice, this list of conditions and the following disclaimer in
+//    the documentation and/or other materials provided with the
+//    distribution.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+// FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+// COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
 // BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
-// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
-// STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+// STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //======================================================================
@@ -48,7 +48,7 @@ module sha1_w_mem(
                   output wire [31 : 0] w
                  );
 
-  
+
   //----------------------------------------------------------------
   // Internal constant and parameter definitions.
   //----------------------------------------------------------------
@@ -57,7 +57,7 @@ module sha1_w_mem(
   parameter CTRL_IDLE   = 1'b0;
   parameter CTRL_UPDATE = 1'b1;
 
-  
+
   //----------------------------------------------------------------
   // Registers including update variables and write enable.
   //----------------------------------------------------------------
@@ -79,31 +79,31 @@ module sha1_w_mem(
   reg [31 : 0] w_mem14_new;
   reg [31 : 0] w_mem15_new;
   reg          w_mem_we;
-  
+
   reg [6 : 0] w_ctr_reg;
   reg [6 : 0] w_ctr_new;
   reg         w_ctr_we;
   reg         w_ctr_inc;
   reg         w_ctr_rst;
-  
+
   reg         sha1_w_mem_ctrl_reg;
   reg         sha1_w_mem_ctrl_new;
   reg         sha1_w_mem_ctrl_we;
-  
-  
+
+
   //----------------------------------------------------------------
   // Wires.
   //----------------------------------------------------------------
   reg [31 : 0] w_tmp;
   reg [31 : 0] w_new;
-  
-  
+
+
   //----------------------------------------------------------------
   // Concurrent connectivity for ports etc.
   //----------------------------------------------------------------
   assign w = w_tmp;
-  
-  
+
+
   //----------------------------------------------------------------
   // reg_update
   //
@@ -131,7 +131,7 @@ module sha1_w_mem(
           w_mem[13]           <= 32'h00000000;
           w_mem[14]           <= 32'h00000000;
           w_mem[15]           <= 32'h00000000;
-          w_ctr_reg           <= 7'b0000000;
+          w_ctr_reg           <= 7'h00;
           sha1_w_mem_ctrl_reg <= CTRL_IDLE;
         end
       else
@@ -155,12 +155,12 @@ module sha1_w_mem(
               w_mem[14] <= w_mem14_new;
               w_mem[15] <= w_mem15_new;
             end
-          
+
           if (w_ctr_we)
             begin
               w_ctr_reg <= w_ctr_new;
             end
-          
+
           if (sha1_w_mem_ctrl_we)
             begin
               sha1_w_mem_ctrl_reg <= sha1_w_mem_ctrl_new;
@@ -169,11 +169,11 @@ module sha1_w_mem(
         end
     end // reg_update
 
-  
+
   //----------------------------------------------------------------
   // select_w
   //
-  // W word selection logic. Returns either directly from the 
+  // W word selection logic. Returns either directly from the
   // memory or the next w value calculated.
   //----------------------------------------------------------------
   always @*
@@ -188,7 +188,7 @@ module sha1_w_mem(
         end
     end // select_w
 
-  
+
   //----------------------------------------------------------------
   // w_mem_update_logic
   //
@@ -220,14 +220,14 @@ module sha1_w_mem(
       w_mem14_new = 32'h00000000;
       w_mem15_new = 32'h00000000;
       w_mem_we    = 0;
-      
+
       w_0   = w_mem[0];
       w_2   = w_mem[2];
       w_8   = w_mem[8];
       w_13  = w_mem[13];
       w_16  = w_13 ^ w_8 ^ w_2 ^ w_0;
       w_new = {w_16[30 : 0], w_16[31]};
-      
+
       if (init)
         begin
           w_mem00_new = block[511 : 480];
@@ -271,7 +271,7 @@ module sha1_w_mem(
         end
     end // w_mem_update_logic
 
-  
+
   //----------------------------------------------------------------
   // w_ctr
   //
@@ -280,23 +280,23 @@ module sha1_w_mem(
   //----------------------------------------------------------------
   always @*
     begin : w_ctr
-      w_ctr_new = 0;
+      w_ctr_new = 7'h00;
       w_ctr_we  = 0;
-      
+
       if (w_ctr_rst)
         begin
-          w_ctr_new = 6'h00;
+          w_ctr_new = 7'h00;
           w_ctr_we  = 1;
         end
 
       if (w_ctr_inc)
         begin
-          w_ctr_new = w_ctr_reg + 6'h01;
+          w_ctr_new = w_ctr_reg + 7'h01;
           w_ctr_we  = 1;
         end
     end // w_ctr
 
-  
+
   //----------------------------------------------------------------
   // sha1_w_mem_fsm
   //
@@ -308,7 +308,7 @@ module sha1_w_mem(
       w_ctr_inc           = 0;
       sha1_w_mem_ctrl_new = CTRL_IDLE;
       sha1_w_mem_ctrl_we  = 0;
-      
+
       case (sha1_w_mem_ctrl_reg)
         CTRL_IDLE:
           begin
@@ -319,14 +319,14 @@ module sha1_w_mem(
                 sha1_w_mem_ctrl_we  = 1;
               end
           end
-        
+
         CTRL_UPDATE:
           begin
             if (next)
               begin
                 w_ctr_inc = 1;
               end
-            
+
             if (w_ctr_reg == SHA1_ROUNDS)
               begin
                 sha1_w_mem_ctrl_new = CTRL_IDLE;
