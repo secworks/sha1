@@ -55,32 +55,43 @@ processing the previous block.
 ### Altera Cyclone FPGAs ###
 Implementation results using Altera Quartus-II 13.1.
 
-**Altera Cyclone IV E**
+** Altera Cyclone IV E**
 - EP4CE6F17C6
 - 2913 LEs
 - 1527 regs
 - 107 MHz
 
-**Altera Cyclone IV GX**
+** Altera Cyclone IV GX**
 - EP4CGX22CF19C6
 - 2814 LEs
 - 1527 regs
 - 105 MHz
 
-**Altera Cyclone V**
+** Altera Cyclone V**
 - 5CGXFC7C7F23C8
 - 1124 ALMs
 - 1527 regs
 - 104 MHz
 
+** Xilinx Spartan-6
+- xc6slx45-3csg324
+- 1589 LUTs
+- 564 Slices
+- 1592 regs
+- 100 MHz
+
 
 ## TODO ##
-* Extensive functional verification in real HW.
-* Add Wishbone interface.
 * Documentation
 
 
 ## Status ##
+
+***(2014-11-07):***
+
+Core has been completed for quite a while. Added new implementation
+results for Spartan-6.
+
 ***(2013-02-25)***
 
 Updated README with some more information about the design.
@@ -139,4 +150,4 @@ design related warnings.
 
 ***(2014-01-29):***
 
-Initial draft. Based on the SHA-256 core. 
+Initial draft. Based on the SHA-256 core.
