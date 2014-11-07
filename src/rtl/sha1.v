@@ -8,30 +8,30 @@
 //
 // Author: Joachim Strombergson
 // Copyright (c) 2013  Secworks Sweden AB
-// 
-// Redistribution and use in source and binary forms, with or 
-// without modification, are permitted provided that the following 
-// conditions are met: 
-// 
-// 1. Redistributions of source code must retain the above copyright 
-//    notice, this list of conditions and the following disclaimer. 
-// 
-// 2. Redistributions in binary form must reproduce the above copyright 
-//    notice, this list of conditions and the following disclaimer in 
-//    the documentation and/or other materials provided with the 
-//    distribution. 
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS 
-// FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE 
-// COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, 
-// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+//
+// Redistribution and use in source and binary forms, with or
+// without modification, are permitted provided that the following
+// conditions are met:
+//
+// 1. Redistributions of source code must retain the above copyright
+//    notice, this list of conditions and the following disclaimer.
+//
+// 2. Redistributions in binary form must reproduce the above copyright
+//    notice, this list of conditions and the following disclaimer in
+//    the documentation and/or other materials provided with the
+//    distribution.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+// FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+// COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
 // BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
-// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
-// STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+// STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //======================================================================
@@ -40,11 +40,11 @@ module sha1(
             // Clock and reset.
             input wire           clk,
             input wire           reset_n,
-            
+
             // Control.
             input wire           cs,
             input wire           we,
-              
+
             // Data ports.
             input wire  [7 : 0]  address,
             input wire  [31 : 0] write_data,
@@ -66,7 +66,7 @@ module sha1(
   parameter ADDR_STATUS      = 8'h09;
   parameter STATUS_READY_BIT = 0;
   parameter STATUS_VALID_BIT = 1;
-                             
+
   parameter ADDR_BLOCK0    = 8'h10;
   parameter ADDR_BLOCK1    = 8'h11;
   parameter ADDR_BLOCK2    = 8'h12;
@@ -83,7 +83,7 @@ module sha1(
   parameter ADDR_BLOCK13   = 8'h1d;
   parameter ADDR_BLOCK14   = 8'h1e;
   parameter ADDR_BLOCK15   = 8'h1f;
-                             
+
   parameter ADDR_DIGEST0   = 8'h20;
   parameter ADDR_DIGEST1   = 8'h21;
   parameter ADDR_DIGEST2   = 8'h22;
@@ -94,7 +94,7 @@ module sha1(
   parameter CORE_NAME1     = 32'h20202020; // "    "
   parameter CORE_VERSION   = 32'h302e3530; // "0.50"
 
-  
+
   //----------------------------------------------------------------
   // Registers including update variables and write enable.
   //----------------------------------------------------------------
@@ -107,7 +107,7 @@ module sha1(
   reg next_new;
   reg next_we;
   reg next_set;
-  
+
   reg ready_reg;
 
   reg [31 : 0] block0_reg;
@@ -147,7 +147,7 @@ module sha1(
 
   reg digest_valid_reg;
 
-  
+
   //----------------------------------------------------------------
   // Wires.
   //----------------------------------------------------------------
@@ -160,8 +160,8 @@ module sha1(
 
   reg [31 : 0]   tmp_read_data;
   reg            tmp_error;
-  
-  
+
+
   //----------------------------------------------------------------
   // Concurrent connectivity for ports etc.
   //----------------------------------------------------------------
@@ -176,34 +176,34 @@ module sha1(
 
   assign read_data = tmp_read_data;
   assign error     = tmp_error;
-  
-             
+
+
   //----------------------------------------------------------------
   // core instantiation.
   //----------------------------------------------------------------
   sha1_core core(
                    .clk(clk),
                    .reset_n(reset_n),
-                   
+
                    .init(core_init),
                    .next(core_next),
-                  
+
                    .block(core_block),
-                   
+
                    .ready(core_ready),
-                   
+
                    .digest(core_digest),
                    .digest_valid(core_digest_valid)
                   );
-  
-  
+
+
   //----------------------------------------------------------------
   // reg_update
   // Update functionality for all registers in the core.
-  // All registers are positive edge triggered with synchronous
-  // active low reset. All registers have write enable.
+  // All registers are positive edge triggered with
+  // asynchronous active low reset.
   //----------------------------------------------------------------
-  always @ (posedge clk)
+  always @ (posedge clk or negedge reset_n)
     begin
       if (!reset_n)
         begin
@@ -243,7 +243,7 @@ module sha1(
             begin
               next_reg <= next_new;
             end
-          
+
           if (core_digest_valid)
             begin
               digest_reg <= core_digest;
@@ -328,7 +328,7 @@ module sha1(
             begin
               block15_reg <= write_data;
             end
-          
+
         end
     end // reg_update
 
@@ -367,7 +367,7 @@ module sha1(
           next_we  = 1;
         end
     end
-  
+
   //----------------------------------------------------------------
   // api
   //
@@ -395,7 +395,7 @@ module sha1(
       block15_we    = 0;
       tmp_read_data = 32'h00000000;
       tmp_error     = 0;
-      
+
       if (cs)
         begin
           if (we)
@@ -407,7 +407,7 @@ module sha1(
                     init_set = write_data[CTRL_INIT_BIT];
                     next_set = write_data[CTRL_NEXT_BIT];
                   end
-                
+
                 ADDR_BLOCK0:
                   begin
                     block0_we = 1;
@@ -487,7 +487,7 @@ module sha1(
                   begin
                     block15_we = 1;
                   end
-                
+
                 default:
                   begin
                     tmp_error = 1;
@@ -503,7 +503,7 @@ module sha1(
                   begin
                     tmp_read_data = CORE_NAME0;
                   end
-                
+
                 ADDR_NAME1:
                   begin
                     tmp_read_data = CORE_NAME1;
@@ -518,12 +518,12 @@ module sha1(
                   begin
                     tmp_read_data = {28'h0000000, 2'b00, next_reg, init_reg};
                   end
-                
+
                 ADDR_STATUS:
                   begin
                     tmp_read_data = {28'h0000000, 2'b00, digest_valid_reg, ready_reg};
                   end
-                
+
                 ADDR_BLOCK0:
                   begin
                     tmp_read_data = block0_reg;
@@ -628,7 +628,7 @@ module sha1(
                   begin
                     tmp_read_data = digest_reg[31  :   0];
                   end
-                
+
                 default:
                   begin
                     tmp_error = 1;
