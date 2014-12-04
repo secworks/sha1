@@ -7,30 +7,30 @@
 //
 // Copyright (c) 2013, Secworks Sweden AB
 // All rights reserved.
-// 
-// Redistribution and use in source and binary forms, with or 
-// without modification, are permitted provided that the following 
-// conditions are met: 
-// 
-// 1. Redistributions of source code must retain the above copyright 
-//    notice, this list of conditions and the following disclaimer. 
-// 
-// 2. Redistributions in binary form must reproduce the above copyright 
-//    notice, this list of conditions and the following disclaimer in 
-//    the documentation and/or other materials provided with the 
-//    distribution. 
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS 
-// FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE 
-// COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, 
-// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+//
+// Redistribution and use in source and binary forms, with or
+// without modification, are permitted provided that the following
+// conditions are met:
+//
+// 1. Redistributions of source code must retain the above copyright
+//    notice, this list of conditions and the following disclaimer.
+//
+// 2. Redistributions in binary form must reproduce the above copyright
+//    notice, this list of conditions and the following disclaimer in
+//    the documentation and/or other materials provided with the
+//    distribution.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+// FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+// COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
 // BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
-// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
-// STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+// STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //======================================================================
@@ -41,7 +41,7 @@
 `timescale 1ns/10ps
 
 module tb_sha1();
-  
+
   //----------------------------------------------------------------
   // Internal constant and parameter definitions.
   //----------------------------------------------------------------
@@ -50,7 +50,7 @@ module tb_sha1();
 
   parameter CLK_HALF_PERIOD = 1;
   parameter CLK_PERIOD = CLK_HALF_PERIOD * 2;
-  
+
   parameter ADDR_NAME0       = 8'h00;
   parameter ADDR_NAME1       = 8'h01;
   parameter ADDR_VERSION     = 8'h02;
@@ -64,7 +64,7 @@ module tb_sha1();
   parameter ADDR_STATUS      = 8'h09;
   parameter STATUS_READY_BIT = 0;
   parameter STATUS_VALID_BIT = 1;
-                             
+
   parameter ADDR_BLOCK0    = 8'h10;
   parameter ADDR_BLOCK1    = 8'h11;
   parameter ADDR_BLOCK2    = 8'h12;
@@ -81,14 +81,14 @@ module tb_sha1();
   parameter ADDR_BLOCK13   = 8'h1d;
   parameter ADDR_BLOCK14   = 8'h1e;
   parameter ADDR_BLOCK15   = 8'h1f;
-                             
+
   parameter ADDR_DIGEST0   = 8'h20;
   parameter ADDR_DIGEST1   = 8'h21;
   parameter ADDR_DIGEST2   = 8'h22;
   parameter ADDR_DIGEST3   = 8'h23;
   parameter ADDR_DIGEST4   = 8'h24;
 
-  
+
   //----------------------------------------------------------------
   // Register and Wire declarations.
   //----------------------------------------------------------------
@@ -106,35 +106,35 @@ module tb_sha1();
 
   reg [31 : 0]  read_data;
   reg [159 : 0] digest_data;
-  
-  
+
+
   //----------------------------------------------------------------
   // Device Under Test.
   //----------------------------------------------------------------
   sha1 dut(
            .clk(tb_clk),
            .reset_n(tb_reset_n),
-             
+
            .cs(tb_cs),
            .we(tb_write_read),
-             
+
            .address(tb_address),
            .write_data(tb_data_in),
            .read_data(tb_data_out),
-           .error(tb_error)   
+           .error(tb_error)
           );
-  
+
 
   //----------------------------------------------------------------
   // clk_gen
   //
-  // Clock generator process. 
+  // Clock generator process.
   //----------------------------------------------------------------
-  always 
+  always
     begin : clk_gen
       #CLK_HALF_PERIOD tb_clk = !tb_clk;
     end // clk_gen
-    
+
 
   //----------------------------------------------------------------
   // sys_monitor
@@ -145,7 +145,7 @@ module tb_sha1();
         begin
           dump_core_state();
         end
-      
+
       if (DEBUG_TOP)
         begin
           dump_top_state();
@@ -155,7 +155,7 @@ module tb_sha1();
       cycle_ctr = cycle_ctr + 1;
     end
 
-  
+
   //----------------------------------------------------------------
   // dump_top_state()
   //
@@ -170,9 +170,9 @@ module tb_sha1();
       $display("address = 0x%02x, write_data = 0x%08x", dut.address, dut.write_data);
       $display("error   = 0x%01x,  read_data  = 0x%08x", dut.error, dut.read_data);
       $display("");
-      
+
       $display("Control and status flags:");
-      $display("init = 0x%01x, next = 0x%01x, ready = 0x%01x", 
+      $display("init = 0x%01x, next = 0x%01x, ready = 0x%01x",
                dut.init_reg, dut.next_reg, dut.ready_reg);
       $display("");
 
@@ -196,7 +196,7 @@ module tb_sha1();
     end
   endtask // dump_top_state
 
-  
+
   //----------------------------------------------------------------
   // dump_core_state()
   //
@@ -207,44 +207,44 @@ module tb_sha1();
       $display("State of core");
       $display("-------------");
       $display("Inputs and outputs:");
-      $display("init   = 0x%01x, next  = 0x%01x", 
+      $display("init   = 0x%01x, next  = 0x%01x",
                dut.core.init, dut.core.next);
       $display("block  = 0x%0128x", dut.core.block);
 
-      $display("ready  = 0x%01x, valid = 0x%01x", 
+      $display("ready  = 0x%01x, valid = 0x%01x",
                dut.core.ready, dut.core.digest_valid);
       $display("digest = 0x%040x", dut.core.digest);
-      $display("H0_reg = 0x%08x, H1_reg = 0x%08x, H2_reg = 0x%08x, H3_reg = 0x%08x, H4_reg = 0x%08x", 
+      $display("H0_reg = 0x%08x, H1_reg = 0x%08x, H2_reg = 0x%08x, H3_reg = 0x%08x, H4_reg = 0x%08x",
                dut.core.H0_reg, dut.core.H1_reg, dut.core.H2_reg, dut.core.H3_reg, dut.core.H4_reg);
       $display("");
-      
+
       $display("Control signals and counter:");
       $display("sha1_ctrl_reg = 0x%01x", dut.core.sha1_ctrl_reg);
-      $display("digest_init   = 0x%01x, digest_update = 0x%01x", 
+      $display("digest_init   = 0x%01x, digest_update = 0x%01x",
                dut.core.digest_init, dut.core.digest_update);
-      $display("state_init    = 0x%01x, state_update  = 0x%01x", 
+      $display("state_init    = 0x%01x, state_update  = 0x%01x",
                dut.core.state_init, dut.core.state_update);
-      $display("first_block   = 0x%01x, ready_flag    = 0x%01x, w_init        = 0x%01x", 
+      $display("first_block   = 0x%01x, ready_flag    = 0x%01x, w_init        = 0x%01x",
                dut.core.first_block, dut.core.ready_flag, dut.core.w_init);
-      $display("round_ctr_inc = 0x%01x, round_ctr_rst = 0x%01x, round_ctr_reg = 0x%02x", 
+      $display("round_ctr_inc = 0x%01x, round_ctr_rst = 0x%01x, round_ctr_reg = 0x%02x",
                dut.core.round_ctr_inc, dut.core.round_ctr_rst, dut.core.round_ctr_reg);
       $display("");
 
       $display("State registers:");
-      $display("a_reg = 0x%08x, b_reg = 0x%08x, c_reg = 0x%08x, d_reg = 0x%08x, e_reg = 0x%08x", 
+      $display("a_reg = 0x%08x, b_reg = 0x%08x, c_reg = 0x%08x, d_reg = 0x%08x, e_reg = 0x%08x",
                dut.core.a_reg, dut.core.b_reg, dut.core.c_reg, dut.core.d_reg,  dut.core.e_reg);
-      $display("a_new = 0x%08x, b_new = 0x%08x, c_new = 0x%08x, d_new = 0x%08x, e_new = 0x%08x", 
+      $display("a_new = 0x%08x, b_new = 0x%08x, c_new = 0x%08x, d_new = 0x%08x, e_new = 0x%08x",
                dut.core.a_new, dut.core.b_new, dut.core.c_new, dut.core.d_new, dut.core.e_new);
       $display("");
 
       $display("State update values:");
-      $display("f = 0x%08x, k = 0x%08x, t = 0x%08x, w = 0x%08x,", 
+      $display("f = 0x%08x, k = 0x%08x, t = 0x%08x, w = 0x%08x,",
                dut.core.state_logic.f, dut.core.state_logic.k, dut.core.state_logic.t, dut.core.w);
       $display("");
     end
   endtask // dump_core_state
-  
-  
+
+
   //----------------------------------------------------------------
   // reset_dut()
   //----------------------------------------------------------------
@@ -257,7 +257,7 @@ module tb_sha1();
     end
   endtask // reset_dut
 
-  
+
   //----------------------------------------------------------------
   // init_sim()
   //
@@ -269,7 +269,7 @@ module tb_sha1();
       cycle_ctr = 32'h00000000;
       error_ctr = 32'h00000000;
       tc_ctr    = 32'h00000000;
-      
+
       tb_clk        = 0;
       tb_reset_n    = 0;
       tb_cs         = 0;
@@ -279,7 +279,7 @@ module tb_sha1();
     end
   endtask // init_dut
 
-  
+
   //----------------------------------------------------------------
   // display_test_result()
   //
@@ -298,8 +298,8 @@ module tb_sha1();
         end
     end
   endtask // display_test_result
-  
-  
+
+
   //----------------------------------------------------------------
   // wait_ready()
   //
@@ -313,14 +313,14 @@ module tb_sha1();
   task wait_ready();
     begin
       read_data = 0;
-      
+
       while (read_data == 0)
         begin
           read_word(ADDR_STATUS);
         end
     end
   endtask // wait_ready
-  
+
 
   //----------------------------------------------------------------
   // read_word()
@@ -345,7 +345,7 @@ module tb_sha1();
         end
     end
   endtask // read_word
-  
+
 
   //----------------------------------------------------------------
   // write_word()
@@ -360,7 +360,7 @@ module tb_sha1();
           $display("*** Writing 0x%08x to 0x%02x.", word, address);
           $display("");
         end
-         
+
       tb_address = address;
       tb_data_in = word;
       tb_cs = 1;
@@ -371,7 +371,7 @@ module tb_sha1();
     end
   endtask // write_word
 
-  
+
   //----------------------------------------------------------------
   // write_block()
   //
@@ -398,7 +398,7 @@ module tb_sha1();
     end
   endtask // write_block
 
-  
+
   //----------------------------------------------------------------
   // check_name_version()
   //
@@ -424,7 +424,7 @@ module tb_sha1();
                version[31 : 24], version[23 : 16], version[15 : 8], version[7 : 0]);
     end
   endtask // check_name_version
-  
+
 
   //----------------------------------------------------------------
   // read_digest()
@@ -446,8 +446,8 @@ module tb_sha1();
       digest_data[31  :   0] = read_data;
     end
   endtask // read_digest
-    
-  
+
+
   //----------------------------------------------------------------
   // single_block_test()
   //
@@ -458,8 +458,8 @@ module tb_sha1();
                          input [159 : 0] expected
                          );
     begin
-      $display("*** TC%01d - Single block test started.", tc_ctr); 
-     
+      $display("*** TC%01d - Single block test started.", tc_ctr);
+
       write_block(block);
       write_word(ADDR_CTRL, CTRL_INIT_VALUE);
       #(CLK_PERIOD);
@@ -477,12 +477,12 @@ module tb_sha1();
           $display("TC%01d: Got:      0x%040x", tc_ctr, digest_data);
           error_ctr = error_ctr + 1;
         end
-      $display("*** TC%01d - Single block test done.", tc_ctr); 
+      $display("*** TC%01d - Single block test done.", tc_ctr);
       tc_ctr = tc_ctr + 1;
     end
   endtask // single_block_test
-    
-  
+
+
   //----------------------------------------------------------------
   // double_block_test()
   //
@@ -496,7 +496,7 @@ module tb_sha1();
                          input [159 : 0] expected1
                         );
     begin
-      $display("*** TC%01d - Double block test started.", tc_ctr); 
+      $display("*** TC%01d - Double block test started.", tc_ctr);
 
       // First block
       write_block(block0);
@@ -523,7 +523,7 @@ module tb_sha1();
       #(CLK_PERIOD);
       wait_ready();
       read_digest();
-      
+
       if (digest_data == expected1)
         begin
           $display("TC%01d final block: OK.", tc_ctr);
@@ -536,15 +536,18 @@ module tb_sha1();
           error_ctr = error_ctr + 1;
         end
 
-      $display("*** TC%01d - Double block test done.", tc_ctr); 
+      $display("*** TC%01d - Double block test done.", tc_ctr);
       tc_ctr = tc_ctr + 1;
     end
   endtask // double_block_test
 
-    
+
   //----------------------------------------------------------------
   // sha1_test
-  // The main test functionality. 
+  // The main test functionality.
+  //
+  // Test cases taken from:
+  // http://csrc.nist.gov/groups/ST/toolkit/documents/Examples/SHA_All.pdf
   //----------------------------------------------------------------
   initial
     begin : sha1_test
@@ -561,7 +564,7 @@ module tb_sha1();
       init_sim();
       reset_dut();
       check_name_version();
-        
+
       // TC1: Single block message: "abc".
       tc1 = 512'h61626380000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000018;
       res1 = 160'ha9993e364706816aba3e25717850c26c9cd0d89d;
@@ -571,11 +574,11 @@ module tb_sha1();
       // "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq"
       tc2_1 = 512'h6162636462636465636465666465666765666768666768696768696A68696A6B696A6B6C6A6B6C6D6B6C6D6E6C6D6E6F6D6E6F706E6F70718000000000000000;
       res2_1 = 160'hf4286818c37b27ae0408f581846771484a566572;
-      
+
       tc2_2 = 512'h000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001C0;
       res2_2 = 160'h84983e441c3bd26ebaae4aa1f95129e5e54670f1;
       double_block_test(tc2_1, res2_1, tc2_2, res2_2);
-      
+
       display_test_result();
       $display("*** Simulation done. ***");
       $finish;
@@ -585,4 +588,3 @@ endmodule // tb_sha1
 //======================================================================
 // EOF tb_sha1.v
 //======================================================================
-
