@@ -115,23 +115,23 @@ module sha1_w_mem(
     begin : reg_update
       if (!reset_n)
         begin
-          w_mem[00]           <= 32'h00000000;
-          w_mem[01]           <= 32'h00000000;
-          w_mem[02]           <= 32'h00000000;
-          w_mem[03]           <= 32'h00000000;
-          w_mem[04]           <= 32'h00000000;
-          w_mem[05]           <= 32'h00000000;
-          w_mem[06]           <= 32'h00000000;
-          w_mem[07]           <= 32'h00000000;
-          w_mem[08]           <= 32'h00000000;
-          w_mem[09]           <= 32'h00000000;
-          w_mem[10]           <= 32'h00000000;
-          w_mem[11]           <= 32'h00000000;
-          w_mem[12]           <= 32'h00000000;
-          w_mem[13]           <= 32'h00000000;
-          w_mem[14]           <= 32'h00000000;
-          w_mem[15]           <= 32'h00000000;
-          w_ctr_reg           <= 7'h00;
+          w_mem[00]           <= 32'h0;
+          w_mem[01]           <= 32'h0;
+          w_mem[02]           <= 32'h0;
+          w_mem[03]           <= 32'h0;
+          w_mem[04]           <= 32'h0;
+          w_mem[05]           <= 32'h0;
+          w_mem[06]           <= 32'h0;
+          w_mem[07]           <= 32'h0;
+          w_mem[08]           <= 32'h0;
+          w_mem[09]           <= 32'h0;
+          w_mem[10]           <= 32'h0;
+          w_mem[11]           <= 32'h0;
+          w_mem[12]           <= 32'h0;
+          w_mem[13]           <= 32'h0;
+          w_mem[14]           <= 32'h0;
+          w_mem[15]           <= 32'h0;
+          w_ctr_reg           <= 7'h0;
           sha1_w_mem_ctrl_reg <= CTRL_IDLE;
         end
       else
@@ -157,15 +157,10 @@ module sha1_w_mem(
             end
 
           if (w_ctr_we)
-            begin
-              w_ctr_reg <= w_ctr_new;
-            end
+            w_ctr_reg <= w_ctr_new;
 
           if (sha1_w_mem_ctrl_we)
-            begin
-              sha1_w_mem_ctrl_reg <= sha1_w_mem_ctrl_new;
-            end
-
+            sha1_w_mem_ctrl_reg <= sha1_w_mem_ctrl_new;
         end
     end // reg_update
 
@@ -203,22 +198,22 @@ module sha1_w_mem(
       reg [31 : 0] w_13;
       reg [31 : 0] w_16;
 
-      w_mem00_new = 32'h00000000;
-      w_mem01_new = 32'h00000000;
-      w_mem02_new = 32'h00000000;
-      w_mem03_new = 32'h00000000;
-      w_mem04_new = 32'h00000000;
-      w_mem05_new = 32'h00000000;
-      w_mem06_new = 32'h00000000;
-      w_mem07_new = 32'h00000000;
-      w_mem08_new = 32'h00000000;
-      w_mem09_new = 32'h00000000;
-      w_mem10_new = 32'h00000000;
-      w_mem11_new = 32'h00000000;
-      w_mem12_new = 32'h00000000;
-      w_mem13_new = 32'h00000000;
-      w_mem14_new = 32'h00000000;
-      w_mem15_new = 32'h00000000;
+      w_mem00_new = 32'h0;
+      w_mem01_new = 32'h0;
+      w_mem02_new = 32'h0;
+      w_mem03_new = 32'h0;
+      w_mem04_new = 32'h0;
+      w_mem05_new = 32'h0;
+      w_mem06_new = 32'h0;
+      w_mem07_new = 32'h0;
+      w_mem08_new = 32'h0;
+      w_mem09_new = 32'h0;
+      w_mem10_new = 32'h0;
+      w_mem11_new = 32'h0;
+      w_mem12_new = 32'h0;
+      w_mem13_new = 32'h0;
+      w_mem14_new = 32'h0;
+      w_mem15_new = 32'h0;
       w_mem_we    = 0;
 
       w_0   = w_mem[0];
@@ -280,12 +275,12 @@ module sha1_w_mem(
   //----------------------------------------------------------------
   always @*
     begin : w_ctr
-      w_ctr_new = 7'h00;
+      w_ctr_new = 7'h0;
       w_ctr_we  = 0;
 
       if (w_ctr_rst)
         begin
-          w_ctr_new = 7'h00;
+          w_ctr_new = 7'h0;
           w_ctr_we  = 1;
         end
 

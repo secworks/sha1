@@ -310,7 +310,7 @@ module sha1(
       block13_we    = 0;
       block14_we    = 0;
       block15_we    = 0;
-      tmp_read_data = 32'h00000000;
+      tmp_read_data = 32'h0;
       tmp_error     = 0;
 
       if (cs)
@@ -394,10 +394,10 @@ module sha1(
                   tmp_read_data = CORE_VERSION;
 
                 ADDR_CTRL:
-                  tmp_read_data = {28'h0000000, 2'b00, next_reg, init_reg};
+                  tmp_read_data = {28'h0, 2'b0, next_reg, init_reg};
 
                 ADDR_STATUS:
-                  tmp_read_data = {28'h0000000, 2'b00, digest_valid_reg, ready_reg};
+                  tmp_read_data = {28'h0, 2'b0, digest_valid_reg, ready_reg};
 
                 ADDR_BLOCK0:
                   tmp_read_data = block0_reg;
