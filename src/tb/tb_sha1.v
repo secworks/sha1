@@ -161,7 +161,7 @@ module tb_sha1();
   //
   // Dump state of the the top of the dut.
   //----------------------------------------------------------------
-  task dump_top_state();
+  task dump_top_state;
     begin
       $display("State of top");
       $display("-------------");
@@ -202,7 +202,7 @@ module tb_sha1();
   //
   // Dump the state of the core inside the dut.
   //----------------------------------------------------------------
-  task dump_core_state();
+  task dump_core_state;
     begin
       $display("State of core");
       $display("-------------");
@@ -248,7 +248,7 @@ module tb_sha1();
   //----------------------------------------------------------------
   // reset_dut()
   //----------------------------------------------------------------
-  task reset_dut();
+  task reset_dut;
     begin
       $display("*** Toggle reset.");
       tb_reset_n = 0;
@@ -264,7 +264,7 @@ module tb_sha1();
   // Initialize all counters and testbed functionality as well
   // as setting the DUT inputs to defined values.
   //----------------------------------------------------------------
-  task init_sim();
+  task init_sim;
     begin
       cycle_ctr = 32'h00000000;
       error_ctr = 32'h00000000;
@@ -285,7 +285,7 @@ module tb_sha1();
   //
   // Display the accumulated test results.
   //----------------------------------------------------------------
-  task display_test_result();
+  task display_test_result;
     begin
       if (error_ctr == 0)
         begin
@@ -310,7 +310,7 @@ module tb_sha1();
   // when the dut is actively processing and will in fact at some
   // point set the flag.
   //----------------------------------------------------------------
-  task wait_ready();
+  task wait_ready;
     begin
       read_data = 0;
 
@@ -404,7 +404,7 @@ module tb_sha1();
   //
   // Read the name and version from the DUT.
   //----------------------------------------------------------------
-  task check_name_version();
+  task check_name_version;
     reg [31 : 0] name0;
     reg [31 : 0] name1;
     reg [31 : 0] version;
@@ -432,7 +432,7 @@ module tb_sha1();
   // Read the digest in the dut. The resulting digest will be
   // available in the global variable digest_data.
   //----------------------------------------------------------------
-  task read_digest();
+  task read_digest;
     begin
       read_word(ADDR_DIGEST0);
       digest_data[159 : 128] = read_data;
