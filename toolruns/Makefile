@@ -21,6 +21,7 @@ TOP_TB_SRC=../src/tb/tb_sha1.v
 SINGLE_SHOT_TOP_SRC=../src/rtl/sha1_single_shot.v $(CORE_SRC)
 
 CC=iverilog
+LINT=verilator
 
 
 all: single_shot_top top core wmem
@@ -62,6 +63,10 @@ debug:
 	@echo "No debug available."
 
 
+lint:	$(TOP_SRC)
+	verilator --lint-only -Wall $(TOP_SRC)
+
+
 clean:
 	rm -f single_shot_top.sim
 	rm -f top.sim
@@ -87,4 +92,3 @@ help:
 #===================================================================
 # EOF Makefile
 #===================================================================
-
