@@ -31,7 +31,7 @@ single_shot_top: $(TOP_TB_SRC) $(SINGLE_SHOT_TOP_SRC)
 	$(CC) -o single_shot_top.sim $(TOP_TB_SRC) $(SINGLE_SHOT_TOP_SRC)
 
 
-top: $(TOP_TB_SRC) $(TOP_SRC) $(CORE_SRC)
+top: $(TOP_TB_SRC) $(TOP_SRC)
 	$(CC) -o top.sim $(TOP_TB_SRC) $(TOP_SRC)
 
 
@@ -64,7 +64,7 @@ debug:
 
 
 lint:	$(TOP_SRC)
-	verilator --lint-only -Wall $(TOP_SRC)
+	verilator --lint-only -Wall -Wno-fatal -Wno-DECLFILENAME $(TOP_SRC) $(CORE_SRC)
 
 
 clean:
