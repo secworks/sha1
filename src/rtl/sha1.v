@@ -114,10 +114,6 @@ module sha1(
   //----------------------------------------------------------------
   // Concurrent connectivity for ports etc.
   //----------------------------------------------------------------
-  assign core_init = init_reg;
-
-  assign core_next = next_reg;
-
   assign core_block = {block_reg[00], block_reg[01], block_reg[02], block_reg[03],
                        block_reg[04], block_reg[05], block_reg[06], block_reg[07],
                        block_reg[08], block_reg[09], block_reg[10], block_reg[11],
@@ -134,8 +130,8 @@ module sha1(
                    .clk(clk),
                    .reset_n(reset_n),
 
-                   .init(core_init),
-                   .next(core_next),
+                   .init(init_reg),
+                   .next(next_reg),
 
                    .block(core_block),
 
