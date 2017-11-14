@@ -160,7 +160,7 @@ module sha1(
           digest_reg       <= 160'h0;
           digest_valid_reg <= 0;
 
-          for (i = 0 ; i < 32 ; i = i + 1)
+          for (i = 0 ; i < 16 ; i = i + 1)
             block_reg[i] <= 32'h0;
         end
       else
