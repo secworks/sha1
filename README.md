@@ -18,6 +18,12 @@ the current block is being processed.
 The implementation also includes a functional model written in Python.
 
 
+## Implementation status ##
+
+The core has been completed and been used in several designs. It is
+considered mature. Minor changes are non-functional cleanups of code.
+
+
 ## Implementation details ##
 
 The sha1 design is divided into the following sections.
@@ -31,18 +37,14 @@ building and simulating the design using [Icarus Verilog](http://iverilog.icarus
 The actual core consists of the following files:
 - sha1_core.v - The core itself with wide interfaces.
 - sha1_w_mem.v - W message block memort and expansion logic.
-- sha1_k_constants.v - K constants ROM memory.
 
 The top level entity is called sha1_core. This entity has wide
 interfaces (512 bit block input, 160 bit digest). In order to make it
 usable you probably want to wrap the core with a bus interface.
 
 Unless you want to provide your own interface you therefore also need to
-select one top level wrapper. There are two wrappers provided:
+use a top level wrapper. There is one wrapper provided:
 - sha1.v - A wrapper with a 32-bit memory like interface.
-- wb_sha1.v - A wrapper that implements a [Wishbone](http://opencores.org/opencores,wishbone) interface.
-
-***Do not include both wrappers in the same project.***
 
 The core (sha1_core) will sample all data inputs when given the init
 or next signal. the wrappers provided contains additional data
@@ -88,7 +90,7 @@ Implementation results using ISE 14.7.
 * Documentation
 
 
-## Status ##
+## Implementation log ##
 
 ***(2014-11-07):***
 

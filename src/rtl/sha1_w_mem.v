@@ -113,25 +113,13 @@ module sha1_w_mem(
   //----------------------------------------------------------------
   always @ (posedge clk or negedge reset_n)
     begin : reg_update
+      integer i;
+
       if (!reset_n)
         begin
-          w_mem[00]           <= 32'h0;
-          w_mem[01]           <= 32'h0;
-          w_mem[02]           <= 32'h0;
-          w_mem[03]           <= 32'h0;
-          w_mem[04]           <= 32'h0;
-          w_mem[05]           <= 32'h0;
-          w_mem[06]           <= 32'h0;
-          w_mem[07]           <= 32'h0;
-          w_mem[08]           <= 32'h0;
-          w_mem[09]           <= 32'h0;
-          w_mem[10]           <= 32'h0;
-          w_mem[11]           <= 32'h0;
-          w_mem[12]           <= 32'h0;
-          w_mem[13]           <= 32'h0;
-          w_mem[14]           <= 32'h0;
-          w_mem[15]           <= 32'h0;
-          w_ctr_reg           <= 7'h0;
+          for (i = 0 ; i < 16 ; i = i + 1)
+            w_mem[i] <= 32'h0;
+
           sha1_w_mem_ctrl_reg <= CTRL_IDLE;
         end
       else

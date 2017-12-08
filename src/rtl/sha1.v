@@ -127,19 +127,19 @@ module sha1(
   // core instantiation.
   //----------------------------------------------------------------
   sha1_core core(
-                   .clk(clk),
-                   .reset_n(reset_n),
+                 .clk(clk),
+                 .reset_n(reset_n),
 
-                   .init(init_reg),
-                   .next(next_reg),
+                 .init(init_reg),
+                 .next(next_reg),
 
-                   .block(core_block),
+                 .block(core_block),
 
-                   .ready(core_ready),
+                 .ready(core_ready),
 
-                   .digest(core_digest),
-                   .digest_valid(core_digest_valid)
-                  );
+                 .digest(core_digest),
+                 .digest_valid(core_digest_valid)
+                );
 
 
   //----------------------------------------------------------------
