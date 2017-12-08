@@ -317,7 +317,7 @@ module sha1_w_mem(
               end
           end
       endcase // case (sha1_ctrl_reg)
-    end // sha1_ctrl_fsm
+    end // sha1_w_mem_fsm
 endmodule // sha1_w_mem
 
 //======================================================================
