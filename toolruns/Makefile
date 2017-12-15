@@ -66,8 +66,8 @@ wmem: $(WMEM_SRC) $(WMEM_TB_SRC)
 	$(CC) -o wmem.sim $(WMEM_SRC) $(WMEM_TB_SRC)
 
 
-sim-single_shot_top: single_shot_top.sim
-	./single_shot_top.sim
+lint:	$(TOP_SRC)
+	verilator --lint-only -Wall -Wno-fatal -Wno-DECLFILENAME $(TOP_SRC)
 
 
 sim-top: top.sim
@@ -80,14 +80,6 @@ sim-core: core.sim
 
 sim-wmem: wmem.sim
 	./wmem.sim
-
-
-debug:
-	@echo "No debug available."
-
-
-lint:	$(TOP_SRC)
-	verilator --lint-only -Wall -Wno-fatal -Wno-DECLFILENAME $(TOP_SRC) $(CORE_SRC)
 
 
 clean:
@@ -109,7 +101,6 @@ help:
 	@echo "sim-top:         Run top level simulation."
 	@echo "sim-core:        Run core level simulation."
 	@echo "sim-wmem:        Run wmem level simulation."
-	@echo "debug:           Print the internal varibles."
 	@echo "clean:           Delete all built files."
 
 #===================================================================

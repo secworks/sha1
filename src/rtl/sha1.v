@@ -100,8 +100,6 @@ module sha1(
   //----------------------------------------------------------------
   // Wires.
   //----------------------------------------------------------------
-  wire           core_init;
-  wire           core_next;
   wire           core_ready;
   wire [511 : 0] core_block;
   wire [159 : 0] core_digest;
