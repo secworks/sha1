@@ -46,28 +46,30 @@ CORE_TB_SRC=../src/tb/tb_sha1_core.v
 TOP_SRC=../src/rtl/sha1.v $(CORE_SRC)
 TOP_TB_SRC=../src/tb/tb_sha1.v
 
-
 CC=iverilog
+CC_FLAGS= -Wall
+
 LINT=verilator
+LINTFLAGS = +1364-2001ext+ --lint-only  -Wall -Wno-fatal -Wno-DECLFILENAME
 
 
 all: top core wmem
 
 
-top: $(TOP_TB_SRC) $(TOP_SRC)
-	$(CC) -o top.sim $(TOP_TB_SRC) $(TOP_SRC)
+top: $(TB_TOP_SRC) $(TOP_SRC)
+	$(CC) $(CC_FLAGS) -o top.sim $(TB_TOP_SRC) $(TOP_SRC)
 
 
 core: $(CORE_TB_SRC) $(CORE_SRC)
-	$(CC) -o core.sim $(CORE_SRC) $(CORE_TB_SRC)
+	$(CC) $(CC_FLAGS) -o core.sim $(CORE_SRC) $(CORE_TB_SRC)
 
 
 wmem: $(WMEM_SRC) $(WMEM_TB_SRC)
-	$(CC) -o wmem.sim $(WMEM_SRC) $(WMEM_TB_SRC)
+	$(CC) $(CC_FLAGS) -o wmem.sim $(WMEM_SRC) $(WMEM_TB_SRC)
 
 
-lint:	$(TOP_SRC)
-	verilator --lint-only -Wall -Wno-fatal -Wno-DECLFILENAME $(TOP_SRC)
+lint: $(TOP_SRC)
+	$(CC) $(CC_FLAGS) $(TOP_SRC)
 
 
 sim-top: top.sim
