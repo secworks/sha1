@@ -113,6 +113,8 @@ module sha1_w_mem(
         begin
           for (i = 0 ; i < 16 ; i = i + 1)
             w_mem[i] <= 32'h0;
+
+          w_ctr_reg <= 7'h0;
         end
       else
         begin
