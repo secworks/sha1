@@ -151,13 +151,9 @@ module sha1_w_mem(
   always @*
     begin : select_w
       if (w_ctr_reg < 16)
-        begin
-          w_tmp = w_mem[w_ctr_reg[3 : 0]];
-        end
+        w_tmp = w_mem[w_ctr_reg[3 : 0]];
       else
-        begin
-          w_tmp = w_new;
-        end
+        w_tmp = w_new;
     end // select_w
 
 
@@ -221,7 +217,7 @@ module sha1_w_mem(
           w_mem_we    = 1;
         end
 
-      else if (w_ctr_reg > 15)
+      if (next && (w_ctr_reg > 15))
         begin
           w_mem00_new = w_mem[01];
           w_mem01_new = w_mem[02];
