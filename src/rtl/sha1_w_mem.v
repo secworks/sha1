@@ -83,12 +83,6 @@ module sha1_w_mem(
   reg [6 : 0] w_ctr_reg;
   reg [6 : 0] w_ctr_new;
   reg         w_ctr_we;
-  reg         w_ctr_inc;
-  reg         w_ctr_rst;
-
-  reg         sha1_w_mem_ctrl_reg;
-  reg         sha1_w_mem_ctrl_new;
-  reg         sha1_w_mem_ctrl_we;
 
 
   //----------------------------------------------------------------
@@ -119,8 +113,6 @@ module sha1_w_mem(
         begin
           for (i = 0 ; i < 16 ; i = i + 1)
             w_mem[i] <= 32'h0;
-
-          sha1_w_mem_ctrl_reg <= CTRL_IDLE;
         end
       else
         begin
@@ -146,9 +138,6 @@ module sha1_w_mem(
 
           if (w_ctr_we)
             w_ctr_reg <= w_ctr_new;
-
-          if (sha1_w_mem_ctrl_we)
-            sha1_w_mem_ctrl_reg <= sha1_w_mem_ctrl_new;
         end
     end // reg_update
 
@@ -264,60 +253,20 @@ module sha1_w_mem(
   always @*
     begin : w_ctr
       w_ctr_new = 7'h0;
-      w_ctr_we  = 0;
+      w_ctr_we  = 1'h0;
 
-      if (w_ctr_rst)
+      if (init)
         begin
           w_ctr_new = 7'h0;
-          w_ctr_we  = 1;
+          w_ctr_we  = 1'h1;
         end
 
-      if (w_ctr_inc)
+      if (next)
         begin
           w_ctr_new = w_ctr_reg + 7'h01;
-          w_ctr_we  = 1;
+          w_ctr_we  = 1'h1;
         end
     end // w_ctr
-
-
-  //----------------------------------------------------------------
-  // sha1_w_mem_fsm
-  //
-  // Logic for the w shedule FSM.
-  //----------------------------------------------------------------
-  always @*
-    begin : sha1_w_mem_fsm
-      w_ctr_rst           = 0;
-      w_ctr_inc           = 0;
-      sha1_w_mem_ctrl_new = CTRL_IDLE;
-      sha1_w_mem_ctrl_we  = 0;
-
-      case (sha1_w_mem_ctrl_reg)
-        CTRL_IDLE:
-          begin
-            if (init)
-              begin
-                w_ctr_rst           = 1;
-                sha1_w_mem_ctrl_new = CTRL_UPDATE;
-                sha1_w_mem_ctrl_we  = 1;
-              end
-          end
-
-        CTRL_UPDATE:
-          begin
-            if (next)
-              begin
-                w_ctr_inc = 1;
-              end
-
-            if (w_ctr_reg == SHA1_ROUNDS)
-              begin
-                sha1_w_mem_ctrl_new = CTRL_IDLE;
-                sha1_w_mem_ctrl_we  = 1;
-              end
-          end
-      endcase // case (sha1_ctrl_reg)
-    end // sha1_w_mem_fsm
 endmodule // sha1_w_mem
 
 //======================================================================

@@ -126,8 +126,8 @@ module tb_sha1_w_mem();
       $display("W state:");
 
 
-      $display("ctrl_reg = %01x, w_ctr_reg = %02x, init = %01x, next = %01x",
-               dut.sha1_w_mem_ctrl_reg, dut.w_ctr_reg, dut.init, dut.next);
+      $display("w_ctr_reg = %02x, init = %01x, next = %01x",
+               dut.w_ctr_reg, dut.init, dut.next);
 
       $display("w_tmp   = %08x, w_new   = %08x", dut.w_tmp, dut.w_new);
 
