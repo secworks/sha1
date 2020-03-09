@@ -1,5 +1,11 @@
 sha1
 ====
+## Implementation status ##
+
+The core has been completed and been used in several designs. It is
+considered mature and ready to use.. Minor changes are non-functional
+cleanups of code.
+
 
 ## Introduction ##
 Verilog implementation of the SHA-1 cryptgraphic hash function. The
@@ -16,12 +22,6 @@ block and digest registers to allow a host to load the next block while
 the current block is being processed.
 
 The implementation also includes a functional model written in Python.
-
-
-## Implementation status ##
-
-The core has been completed and been used in several designs. It is
-considered mature. Minor changes are non-functional cleanups of code.
 
 
 ## Implementation details ##
@@ -85,7 +85,3 @@ Implementation results using ISE 14.7.
 - 564 Slices
 - 1592 regs
 - 100 MHz
-
-
-## TODO ##
-* Documentation
