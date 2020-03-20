@@ -53,18 +53,18 @@ LINT = verilator
 LINT_FLAGS = +1364-2001ext+ --lint-only  -Wall -Wno-fatal -Wno-DECLFILENAME
 
 
-all: top core wmem
+all: top.sim core.sim wmem.sim
 
 
-top: $(TB_TOP_SRC) $(TOP_SRC)
-	$(CC) $(CC_FLAGS) -o top.sim $(TB_TOP_SRC) $(TOP_SRC)
+top.sim: $(TOP_TB_SRC) $(TOP_SRC)
+	$(CC) $(CC_FLAGS) -o top.sim $(TOP_TB_SRC) $(TOP_SRC)
 
 
-core: $(CORE_TB_SRC) $(CORE_SRC)
+core.sim: $(CORE_TB_SRC) $(CORE_SRC)
 	$(CC) $(CC_FLAGS) -o core.sim $(CORE_SRC) $(CORE_TB_SRC)
 
 
-wmem: $(WMEM_SRC) $(WMEM_TB_SRC)
+wmem.sim: $(WMEM_SRC) $(WMEM_TB_SRC)
 	$(CC) $(CC_FLAGS) -o wmem.sim $(WMEM_SRC) $(WMEM_TB_SRC)
 
 
