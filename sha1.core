@@ -1,0 +1,50 @@
+CAPI=2:
+
+name : secworks:crypto:sha1:0
+
+filesets:
+  rtl:
+    files:
+      - src/rtl/sha1.v
+      - src/rtl/sha1_core.v
+      - src/rtl/sha1_w_mem.v
+    file_type : verilogSource
+
+  tb:
+    files:
+      - src/tb/tb_sha1.v
+      - src/tb/tb_sha1_core.v
+      - src/tb/tb_sha1_w_mem.v
+    file_type : verilogSource
+
+  openlane: {files : [data/sky130.tcl : {file_type : tclSource}]}
+
+targets:
+  default:
+    filesets: [rtl]
+
+  lint:
+    default_tool : verilator
+    filesets : [rtl]
+    tools:
+      verilator:
+        mode : lint-only
+    toplevel : sha1
+
+  sky130:
+    default_tool: openlane
+    filesets: [rtl, openlane]
+    toplevel: sha1
+
+  tb_sha1: &tb
+    default_tool: icarus
+    filesets: [rtl, tb]
+    toplevel : tb_sha1
+
+  tb_sha1_core:
+    <<: *tb
+    toplevel : tb_sha1_core
+
+  tb_sha1_w_mem:
+    <<: *tb
+    toplevel : tb_sha1_w_mem

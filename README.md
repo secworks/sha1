@@ -52,6 +52,41 @@ registers. This allows you to load a new block while the core is
 processing the previous block.
 
 
+## FuseSoC
+This core is supported by the
+[FuseSoC](https://github.com/olofk/fusesoc) core package manager and
+build system. Some quick  FuseSoC instructions:
+
+Install FuseSoC
+~~~
+pip install fusesoc
+~~~
+
+Create and enter a new workspace
+~~~
+mkdir workspace && cd workspace
+~~~
+
+Register sha512 as a library in the workspace
+~~~
+fusesoc library add sha512 /path/to/sha512
+~~~
+...if repo is available locally or...
+...to get the upstream repo
+~~~
+fusesoc library add sha512 https://github.com/secworks/sha512
+~~~
+
+Run tb_sha512 testbench
+~~~
+fusesoc run --target=tb_sha512 secworks:crypto:sha512
+~~~
+
+Run with modelsim instead of default tool (icarus)
+~~~
+fusesoc run --target=tb_sha512 --tool=modelsim secworks:crypto:sha512
+~~~
+
 ## FPGA-results ##
 
 ### Altera Cyclone FPGAs ###
