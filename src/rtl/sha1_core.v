@@ -36,6 +36,8 @@
 //
 //======================================================================
 
+`default_nettype none
+
 module sha1_core(
                  input wire            clk,
                  input wire            reset_n,
