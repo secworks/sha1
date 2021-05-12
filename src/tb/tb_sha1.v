@@ -98,6 +98,7 @@ module tb_sha1();
   reg [7 : 0]   tb_address;
   reg [31 : 0]  tb_data_in;
   wire [31 : 0] tb_data_out;
+  wire          tb_error;
 
   reg [31 : 0]  read_data;
   reg [159 : 0] digest_data;
