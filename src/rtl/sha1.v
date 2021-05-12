@@ -154,11 +154,11 @@ module sha1(
 
       if (!reset_n)
         begin
-          init_reg         <= 0;
-          next_reg         <= 0;
-          ready_reg        <= 0;
+          init_reg         <= 1'h0;
+          next_reg         <= 1'h0;
+          ready_reg        <= 1'h0;
           digest_reg       <= 160'h0;
-          digest_valid_reg <= 0;
+          digest_valid_reg <= 1'h0;
 
           for (i = 0 ; i < 16 ; i = i + 1)
             block_reg[i] <= 32'h0;
@@ -185,18 +185,18 @@ module sha1(
   //----------------------------------------------------------------
   always @*
     begin : api
-      init_new      = 0;
-      next_new      = 0;
-      block_we      = 0;
+      init_new      = 1'h0;
+      next_new      = 1'h0;
+      block_we      = 1'h0;
       tmp_read_data = 32'h0;
-      tmp_error     = 0;
+      tmp_error     = 1'h0;
 
       if (cs)
         begin
           if (we)
             begin
               if ((address >= ADDR_BLOCK0) && (address <= ADDR_BLOCK15))
-                block_we = 1;
+                block_we = 1'h1;
 
               if (address == ADDR_CTRL)
                 begin
@@ -231,7 +231,7 @@ module sha1(
 
                 default:
                   begin
-                    tmp_error = 1;
+                    tmp_error = 1'h1;
                   end
               endcase // case (addr)
             end

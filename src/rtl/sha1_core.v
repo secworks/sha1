@@ -170,8 +170,8 @@ module sha1_core(
           H2_reg           <= 32'h0;
           H3_reg           <= 32'h0;
           H4_reg           <= 32'h0;
-          digest_valid_reg <= 0;
-          round_ctr_reg    <= 7'b0;
+          digest_valid_reg <= 1'h0;
+          round_ctr_reg    <= 7'h0;
           sha1_ctrl_reg    <= CTRL_IDLE;
         end
       else
@@ -264,7 +264,7 @@ module sha1_core(
       c_new  = 32'h0;
       d_new  = 32'h0;
       e_new  = 32'h0;
-      a_e_we = 0;
+      a_e_we = 1'h0;
 
       if (state_init)
         begin
@@ -332,18 +332,18 @@ module sha1_core(
   //----------------------------------------------------------------
   always @*
     begin : round_ctr
-      round_ctr_new = 0;
-      round_ctr_we  = 0;
+      round_ctr_new = 7'h0;
+      round_ctr_we  = 1'h0;
 
       if (round_ctr_rst)
         begin
-          round_ctr_new = 0;
-          round_ctr_we  = 1;
+          round_ctr_new = 7'h0;
+          round_ctr_we  = 1'h1;
         end
 
       if (round_ctr_inc)
         begin
-          round_ctr_new = round_ctr_reg + 1'b1;
+          round_ctr_new = round_ctr_reg + 1'h1;
           round_ctr_we  = 1;
         end
     end // round_ctr
@@ -355,20 +355,20 @@ module sha1_core(
   //----------------------------------------------------------------
   always @*
     begin : sha1_ctrl_fsm
-      digest_init      = 0;
-      digest_update    = 0;
-      state_init       = 0;
-      state_update     = 0;
-      first_block      = 0;
-      ready_flag       = 0;
-      w_init           = 0;
-      w_next           = 0;
-      round_ctr_inc    = 0;
-      round_ctr_rst    = 0;
-      digest_valid_new = 0;
-      digest_valid_we  = 0;
+      digest_init      = 1'h0;
+      digest_update    = 1'h0;
+      state_init       = 1'h0;
+      state_update     = 1'h0;
+      first_block      = 1'h0;
+      ready_flag       = 1'h0;
+      w_init           = 1'h0;
+      w_next           = 1'h0;
+      round_ctr_inc    = 1'h0;
+      round_ctr_rst    = 1'h0;
+      digest_valid_new = 1'h0;
+      digest_valid_we  = 1'h0;
       sha1_ctrl_new    = CTRL_IDLE;
-      sha1_ctrl_we     = 0;
+      sha1_ctrl_we     = 1'h0;
 
       case (sha1_ctrl_reg)
         CTRL_IDLE:
@@ -377,51 +377,51 @@ module sha1_core(
 
             if (init)
               begin
-                digest_init      = 1;
-                w_init           = 1;
-                state_init       = 1;
-                first_block      = 1;
-                round_ctr_rst    = 1;
-                digest_valid_new = 0;
-                digest_valid_we  = 1;
+                digest_init      = 1'h1;
+                w_init           = 1'h1;
+                state_init       = 1'h1;
+                first_block      = 1'h1;
+                round_ctr_rst    = 1'h1;
+                digest_valid_new = 1'h0;
+                digest_valid_we  = 1'h1;
                 sha1_ctrl_new    = CTRL_ROUNDS;
-                sha1_ctrl_we     = 1;
+                sha1_ctrl_we     = 1'h1;
               end
 
             if (next)
               begin
-                w_init           = 1;
-                state_init       = 1;
-                round_ctr_rst    = 1;
-                digest_valid_new = 0;
-                digest_valid_we  = 1;
+                w_init           = 1'h1;
+                state_init       = 1'h1;
+                round_ctr_rst    = 1'h1;
+                digest_valid_new = 1'h0;
+                digest_valid_we  = 1'h1;
                 sha1_ctrl_new    = CTRL_ROUNDS;
-                sha1_ctrl_we     = 1;
+                sha1_ctrl_we     = 1'h1;
               end
           end
 
 
         CTRL_ROUNDS:
           begin
-            state_update  = 1;
-            round_ctr_inc = 1;
-            w_next        = 1;
+            state_update  = 1'h1;
+            round_ctr_inc = 1'h1;
+            w_next        = 1'h1;
 
             if (round_ctr_reg == SHA1_ROUNDS)
               begin
                 sha1_ctrl_new = CTRL_DONE;
-                sha1_ctrl_we  = 1;
+                sha1_ctrl_we  = 1'h1;
               end
           end
 
 
         CTRL_DONE:
           begin
-            digest_update    = 1;
-            digest_valid_new = 1;
-            digest_valid_we  = 1;
+            digest_update    = 1'h1;
+            digest_valid_new = 1'h1;
+            digest_valid_we  = 1'h1;
             sha1_ctrl_new    = CTRL_IDLE;
-            sha1_ctrl_we     = 1;
+            sha1_ctrl_we     = 1'h1;
           end
       endcase // case (sha1_ctrl_reg)
     end // sha1_ctrl_fsm

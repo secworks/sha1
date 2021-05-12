@@ -52,15 +52,6 @@ module sha1_w_mem(
 
 
   //----------------------------------------------------------------
-  // Internal constant and parameter definitions.
-  //----------------------------------------------------------------
-  parameter SHA1_ROUNDS = 79;
-
-  parameter CTRL_IDLE   = 1'b0;
-  parameter CTRL_UPDATE = 1'b1;
-
-
-  //----------------------------------------------------------------
   // Registers including update variables and write enable.
   //----------------------------------------------------------------
   reg [31 : 0] w_mem [0 : 15];
@@ -191,7 +182,7 @@ module sha1_w_mem(
       w_mem13_new = 32'h0;
       w_mem14_new = 32'h0;
       w_mem15_new = 32'h0;
-      w_mem_we    = 0;
+      w_mem_we    = 1'h0;
 
       w_0   = w_mem[0];
       w_2   = w_mem[2];
@@ -218,7 +209,7 @@ module sha1_w_mem(
           w_mem13_new = block[95  :  64];
           w_mem14_new = block[63  :  32];
           w_mem15_new = block[31  :   0];
-          w_mem_we    = 1;
+          w_mem_we    = 1'h1;
         end
 
       if (next && (w_ctr_reg > 15))
@@ -239,7 +230,7 @@ module sha1_w_mem(
           w_mem13_new = w_mem[14];
           w_mem14_new = w_mem[15];
           w_mem15_new = w_new;
-          w_mem_we    = 1;
+          w_mem_we    = 1'h1;
         end
     end // w_mem_update_logic
 
