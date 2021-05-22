@@ -67,24 +67,24 @@ Create and enter a new workspace
 mkdir workspace && cd workspace
 ~~~
 
-Register sha512 as a library in the workspace
+Register sha1 as a library in the workspace
 ~~~
-fusesoc library add sha512 /path/to/sha512
+fusesoc library add sha1 /path/to/sha1
 ~~~
 ...if repo is available locally or...
 ...to get the upstream repo
 ~~~
-fusesoc library add sha512 https://github.com/secworks/sha512
+fusesoc library add sha1 https://github.com/secworks/sha1
 ~~~
 
-Run tb_sha512 testbench
+Run tb_sha1 testbench
 ~~~
-fusesoc run --target=tb_sha512 secworks:crypto:sha512
+fusesoc run --target=tb_sha1 secworks:crypto:sha1
 ~~~
 
 Run with modelsim instead of default tool (icarus)
 ~~~
-fusesoc run --target=tb_sha512 --tool=modelsim secworks:crypto:sha512
+fusesoc run --target=tb_sha1 --tool=modelsim secworks:crypto:sha1
 ~~~
 
 ## FPGA-results ##
