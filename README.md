@@ -1,7 +1,8 @@
 sha1
 ====
-## Implementation status ##
+Verilog implementation of the SHA-1 cryptgraphic hash function.
 
+## Implementation status ##
 The core has been completed and been used in several designs. It is
 considered mature and ready to use.. Minor changes are non-functional
 cleanups of code.
@@ -22,6 +23,13 @@ block and digest registers to allow a host to load the next block while
 the current block is being processed.
 
 The implementation also includes a functional model written in Python.
+
+
+### Contact information ##
+Assured provides customer support including customization, integration
+and system development related to the core. For more information,
+please contact [Assured Security
+Consultants](https://www.assured.se/contact).
 
 
 ## Implementation details ##
